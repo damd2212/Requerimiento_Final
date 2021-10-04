@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import sop_corba.GestionAnteproyectosIntPOA;
+import sop_corba.GestionSeguimientoInt;
 import sop_corba.clsConceptosDTO;
 import sop_corba.clsFormatoADTO;
 import sop_corba.clsFormatoBDTO;
@@ -14,6 +15,7 @@ import sop_corba.clsFormatosDTO;
 
 public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
 
+    private GestionSeguimientoInt objSeguimiento;
     private ArrayList<clsFormatoADTO> formatosA;
     private ArrayList<clsFormatoBDTO> formatosB;
     private ArrayList<clsFormatoCDTO> formatosC;
@@ -21,6 +23,14 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
     private ArrayList<Integer> AntNoRemitidos;
     private ArrayList<Integer> AntRemitidos;
     private static int incremental = 0;
+    
+    public GestionAnteproyectosImpl(){
+        
+    }
+    
+    public void almacenarReferenciaRemota(GestionSeguimientoInt objSeguimiento){
+        this.objSeguimiento = objSeguimiento;
+    }
 
     /**
      * Metodo remoto que registra el anteproyecto en la lista de Formatos A
@@ -268,6 +278,7 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
             }
 
             if (concepto1 == 1 && concepto2 == 1) {
+                this.AntNoRemitidos.add(codigoAnt);
                 System.out.println("Anteproyecto aprobado por los dos evaluadores");
             }
         }
@@ -504,7 +515,6 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
 
     @Override
     public clsFormatoCDTO[] listaAteproyectosC() {
-
         System.out.println("==Listar Anteproyectos FormatoC==");
         ArrayList<clsFormatoCDTO> formC = new ArrayList();
 
@@ -518,33 +528,99 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
             }
         }
         
-        return formC;
-
+        clsFormatoCDTO[] arrayFromatosC = formC.toArray(new clsFormatoCDTO[0]);
+        
+        return arrayFromatosC;
     }
 
     @Override
     public clsFormatoDDTO[] listaAteproyectosD() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        System.out.println("==Listar Anteproyectos FormatoD==");
+        ArrayList<clsFormatoDDTO> formD = new ArrayList();
+
+        for (int j = 0; j < this.formatosA.size(); j++) {
+            if (this.formatosA.get(j).flujo == 5) {
+                for (int i = 0; i < this.formatosD.size(); i++) {
+                    if (this.formatosA.get(j).codAnteproyecto == this.formatosD.get(i).codAnteproyecto && this.formatosD.get(i).conceptoCoodinador.equals("Aprobado")) {
+                        formD.add(this.formatosD.get(i));
+                    }
+                }
+            }
+        }
+        clsFormatoDDTO[] arrayFromatosD = formD.toArray(new clsFormatoDDTO[0]);
+        return arrayFromatosD;
+        
     }
 
     @Override
     public clsFormatoADTO[] listaSinAsignar() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        System.out.println("==Lista de formatos sin asignar==");
+
+        ArrayList<clsFormatoADTO> formaA = new ArrayList();
+        int ban = 0;
+
+        for (int i = 0; i < this.formatosA.size(); i++) {
+            if (this.formatosA.get(i).flujo == 1) {
+                for (int j = 0; j < this.formatosB.size(); j++) {
+                    if (this.formatosA.get(i).codAnteproyecto == this.formatosB.get(j).codAnteproyecto) {
+                        ban += 1;
+                    }
+                }
+                if (ban == 0) {
+                    formaA.add(this.formatosA.get(i));
+                }
+            }
+            ban = 0;
+        }
+        
+        clsFormatoADTO[] arraySinAsignar = formaA.toArray(new clsFormatoADTO[0]);
+        
+        return arraySinAsignar;
+
     }
 
     @Override
     public int[] listaAntNoRemitidos(int idDirector) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        System.out.println("==Invocando a listar anteproyectos sin remitir==");
+        ArrayList<Integer> listaAuxNoRemitidos = new ArrayList();
+        for (int i = 0; i < this.formatosA.size(); i++) {
+            for (int j = 0; j < this.AntNoRemitidos.size(); j++) {
+                if (this.formatosA.get(i).codAnteproyecto == this.AntNoRemitidos.get(j)) {
+                    if (this.formatosA.get(i).codDirector == idDirector) {
+                        int codigo = this.formatosA.get(i).codAnteproyecto;
+                        listaAuxNoRemitidos.add(codigo);
+                    }
+                }
+            }
+        }
+        
+        int[] arrayNoRemitidos = listaAuxNoRemitidos.stream().mapToInt(i->i).toArray();
+        
+        return arrayNoRemitidos;
+        
     }
 
     @Override
     public boolean remitirAnteproyecto(int codAnteproyecto) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        System.out.println("==Invocando a remitir Anteproyecto");
+        boolean bandera = false;
+        if (this.AntRemitidos.add(codAnteproyecto)) {
+            actualizarAntNoRemitidos(codAnteproyecto);
+            bandera = true;
+        }
+        return bandera;
+
     }
 
     @Override
     public int[] listaAntRemitidos() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("==Invvocando a listar anteproyectos remitidos==");
+        int[] arrayRemitidos = this.AntRemitidos.stream().mapToInt(i->i).toArray();
+        return arrayRemitidos;
     }
 
     /**
@@ -630,15 +706,14 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
             }
         }
 
-        clsFormatosDTO formatosS = new clsFormatosDTO(formatoA, formatoB1, formatoB2, formatoCS, formatoD, codigo);
+        clsFormatosDTO formatos = new clsFormatosDTO(formatoA, formatoB1, formatoB2, formatoC, formatoD, codigo);
 
-        boolean registro = objSeguimiento.RegistrarHistorial(formatosS);
+        boolean registro = objSeguimiento.RegistrarHistorial(formatos);
         if (registro == true) {
             System.out.println("==Registrado exitosamente en el historial");
 
         } else {
             System.out.println("==No se pudo registrar el formato en el historial");
         }
-
     }
 }
