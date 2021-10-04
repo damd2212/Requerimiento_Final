@@ -1,9 +1,18 @@
 //Presentado por: Jefferson Eduardo Campo - Danny Alberto Diaz
 package SSeguimientoAnteproyectos.vistas;
 
-import SSeguimientoAnteproyectos.utilidades.UtilidadesRegistroS;
-import SSeguimientoAnteproyectos.sop_rmi.GestionSeguimientoImpl;
+import SSeguimientoAnteproyectos.GestionSeguimientoImpl;
 import javax.swing.JOptionPane;
+import org.omg.CosNaming.*;
+import org.omg.CosNaming.NamingContextPackage.*;
+import org.omg.CORBA.*;
+import org.omg.PortableServer.*;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
+import org.omg.PortableServer.POAPackage.ServantNotActive;
+import org.omg.PortableServer.POAPackage.WrongPolicy;
+import sop_corba.GestionSeguimientoInt;
+import sop_corba.GestionSeguimientoIntHelper;
 
 public class GUIConectarServidorSeguimiento extends javax.swing.JFrame {
 
@@ -115,31 +124,54 @@ public class GUIConectarServidorSeguimiento extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private static void inicializarORB(String[] vec, GestionSeguimientoImpl objRemoto) throws ServantNotActive, WrongPolicy, org.omg.CORBA.ORBPackage.InvalidName, AdapterInactive, InvalidName, NotFound, CannotProceed {
+        // crea e inicia el ORB
+        ORB orb = ORB.init(vec, null);
+        POA rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+        rootpoa.the_POAManager().activate();
+
+        //* se genera la referencia del servant
+        org.omg.CORBA.Object obj = rootpoa.servant_to_reference(objRemoto);
+        GestionSeguimientoInt href = GestionSeguimientoIntHelper.narrow(obj);
+
+        // se obtiene un link al name service
+        org.omg.CORBA.Object objref = orb.resolve_initial_references("NameService");
+        NamingContextExt ncref = NamingContextExtHelper.narrow(objref);
+
+        // * se realiza el binding de la referencia del servant en el N_S *
+        String name = "objSeguimiento";
+        NameComponent path[] = ncref.to_name(name);
+        ncref.rebind(path, href);
+
+        System.out.println("El Servidor esta listo y esperando ...");
+        
+        GUIInfoServidor2 info2 = new GUIInfoServidor2();
+        info2.setVisible(true);
+        info2.setLocationRelativeTo(null);
+        String mensaje = "Objeto remoto inicializado, El Servidor esta listo y esperando ...";
+        info2.jtxtAMensaje2.setText(mensaje);
+        info2.dispose();
+        orb.run();
+    }
+    
     /**
      * Evento generado para conectar el servidor 
      */
     private void btnConectarSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarSActionPerformed
-        // TODO add your handling code here:
-        String mensajeRegistroOR;
-        String mensajeArrancarNS;
-        
-        int puerto = Integer.parseInt(jtxtFPuertoS.getText());
         try{
+            String[] vec = new String[4];
+            vec[0] = "-ORBInitialHost";
+            vec[1] = jtxtFDirIpS.getText();
+            vec[2] = "-ORBInitialPort";
+            vec[3] = jtxtFPuertoS.getText();
             GestionSeguimientoImpl objRemoto = new GestionSeguimientoImpl();
-            mensajeArrancarNS = UtilidadesRegistroS.arrancarNS(jtxtFDirIpS.getText(),puerto);
-            mensajeRegistroOR = UtilidadesRegistroS.RegistrarObjetoRemoto(objRemoto, jtxtFDirIpS.getText(), puerto, "objetoRemotoSeguimiento");
-            GUIInfoServidor2 info2 = new GUIInfoServidor2();
-            info2.setVisible(true);
-            info2.setLocationRelativeTo(null);
-            String mensaje = mensajeArrancarNS+"\n" + mensajeRegistroOR+"\n";
-            info2.jtxtAMensaje2.setText(mensaje);
-            this.dispose();
-            
-        }catch(Exception e){
-            JOptionPane.showMessageDialog(null, "No fue posible arrancar el NS o registrar el objeto remoto" + e.getMessage());
-            System.err.println("No fue posible arrancar el NS o registrar el objeto remoto" + e.getMessage());
-            
-        }
+            inicializarORB(vec,objRemoto);
+        } 
+	catch (Exception e) {
+		System.out.println("Error: " + e);
+		e.printStackTrace(System.out);
+	}
+	System.out.println("Servidor: Saliendo ...");
     }//GEN-LAST:event_btnConectarSActionPerformed
 
     /**

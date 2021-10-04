@@ -5,6 +5,8 @@
  */
 package SSeguimientoAnteproyectos;
 
+import SSeguimientoAnteproyectos.vistas.GUIConectarServidorSeguimiento;
+
 /**
  *
  * @author danny
@@ -15,7 +17,9 @@ public class ServidorDeObjetosSeguimiento {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        GUIConectarServidorSeguimiento objServidorSeguimiento = new GUIConectarServidorSeguimiento();
+        objServidorSeguimiento.setVisible(true);
+        objServidorSeguimiento.setLocationRelativeTo(null);
     }
     
 }
