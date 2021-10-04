@@ -25,7 +25,12 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
     private static int incremental = 0;
     
     public GestionAnteproyectosImpl(){
-        
+        this.formatosA = new ArrayList();
+        this.formatosB = new ArrayList();
+        this.formatosC = new ArrayList();
+        this.formatosD = new ArrayList();
+        this.AntNoRemitidos = new ArrayList();
+        this.AntRemitidos = new ArrayList();
     }
     
     public void almacenarReferenciaRemota(GestionSeguimientoInt objSeguimiento){
