@@ -424,7 +424,7 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
     }
 
     @Override
-    public int verificarAsignacion(int CodAnteproyecto, int idEvaluador) {
+    public boolean verificarAsignacion(int CodAnteproyecto, int idEvaluador) {
 
         System.out.println("==Verificar Asignacion==");
         boolean bandera = false;
@@ -433,7 +433,7 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
             return bandera;
         } else {
             for (int i = 0; i < this.formatosB.size(); i++) {
-                if (this.formatosB.get(i).getCodAnteproyecto() == CodAnteproyecto && this.formatosB.get(i).getIdEvaluador() == idEvaluador) {
+                if (this.formatosB.get(i).codAnteproyecto == CodAnteproyecto && this.formatosB.get(i).idEvaluador == idEvaluador) {
                     bandera = true;
                     break;
                 }
@@ -445,17 +445,81 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
 
     @Override
     public clsFormatoBDTO[] listaAteproyectosAsignados(int idEvaluador) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        System.out.println("==Listar Anteproyectos Asignados a Evaluadores==");
+        
+        ArrayList<clsFormatoBDTO> aux = new ArrayList();
+
+        for (int i = 0; i < this.formatosB.size(); i++) {
+            if (this.formatosB.get(i).idEvaluador == idEvaluador && this.formatosB.get(i).concepto.equals("") || this.formatosB.get(i).concepto.equals("No Aprobado")) {
+                aux.add(this.formatosB.get(i));
+            }
+        }
+        
+        clsFormatoBDTO[] asignados = aux.toArray(new clsFormatoBDTO[0]);
+        return asignados;
+        
     }
 
     @Override
     public clsFormatoBDTO[] listaAteproyectosB() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        System.out.println("== Listar Anteproyectos Aprobado B==");
+        ArrayList<clsFormatoBDTO> formB = new ArrayList();
+        ArrayList<clsFormatoBDTO> listaAux = new ArrayList();
+        ArrayList<clsFormatoBDTO> listaAux2 = new ArrayList();
+        listaAux = formatosB;
+        int idEvaluador = 0;
+
+        for (int k = 0; k < this.formatosA.size(); k++) {
+            if (this.formatosA.get(k).flujo == 3) {
+
+                for (int i = 0; i < this.formatosB.size(); i++) {
+                    if (this.formatosA.get(k).codAnteproyecto == this.formatosB.get(i).codAnteproyecto && this.formatosB.get(i).concepto.equals("Aprobado")) {
+                        for (int j = 0; j < listaAux.size(); j++) {
+                            if (this.formatosB.get(i).codAnteproyecto == listaAux.get(j).codAnteproyecto && this.formatosB.get(i).idEvaluador != listaAux.get(j).idEvaluador) {
+                                if (listaAux.get(j).concepto.equals("Aprobado")) {
+                                    formB.add(this.formatosB.get(i));
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+        if (!(formB.isEmpty())) {
+            for (int u = 0; u < formB.size(); u = u + 2) {
+                listaAux2.add(formB.get(u));
+            }
+
+            formB = listaAux2;
+            
+        }
+        clsFormatoBDTO[] arrayformatosB = formB.toArray(new clsFormatoBDTO[0]);
+        return arrayformatosB;
+
     }
 
     @Override
     public clsFormatoCDTO[] listaAteproyectosC() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        System.out.println("==Listar Anteproyectos FormatoC==");
+        ArrayList<clsFormatoCDTO> formC = new ArrayList();
+
+        for (int j = 0; j < this.formatosA.size(); j++) {
+            if (this.formatosA.get(j).flujo == 4) {
+                for (int i = 0; i < this.formatosC.size(); i++) {
+                    if (this.formatosA.get(j).codAnteproyecto == this.formatosC.get(i).codAnteproyecto && this.formatosC.get(i).conceptoDepto.equals("Aprobado")) {
+                        formC.add(this.formatosC.get(i));
+                    }
+                }
+            }
+        }
+        
+        return formC;
+
     }
 
     @Override
