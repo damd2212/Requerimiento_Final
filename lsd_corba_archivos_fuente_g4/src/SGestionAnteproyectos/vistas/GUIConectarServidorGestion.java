@@ -1,6 +1,7 @@
 //Presentado por: Jefferson Eduardo Campo - Danny Alberto Diaz
 package SGestionAnteproyectos.vistas;
 
+import SSeguimientoAnteproyectos.*;
 import SGestionAnteproyectos.GestionAnteproyectosImpl;
 import SGestionAnteproyectos.GestionUsuariosImpl;
 import java.util.logging.Level;
@@ -21,6 +22,8 @@ import org.omg.PortableServer.POAPackage.WrongPolicy;
 
 import sop_corba.GestionAnteproyectosInt;
 import sop_corba.GestionAnteproyectosIntHelper;
+import sop_corba.GestionSeguimientoInt;
+import sop_corba.GestionSeguimientoIntHelper;
 import sop_corba.GestionUsuariosInt;
 import sop_corba.GestionUsuariosIntHelper;
 
@@ -156,10 +159,11 @@ public class GUIConectarServidorGestion extends javax.swing.JFrame {
         vec[1] = jtxtFDirIp.getText();
         vec[2] = "-ORBInitialPort";
         vec[3] = jtxtFPuerto.getText();
-        AnteproyectoImpl objRemoto = new AnteproyectoImpl();
-        AnteproyectoCllbckInt ref = obtenerReferenciaAdministrador(vec);
+        GestionAnteproyectosImpl objRemoto = new GestionAnteproyectosImpl();
+        GestionUsuariosImpl objRemoto2 = new GestionUsuariosImpl();
+        GestionSeguimientoInt ref = obtenerReferenciaSSeguimiento(vec);
         objRemoto.almacenarReferenciaRemota(ref);
-        inicializarORB(vec,objRemoto);
+        inicializarORB(vec,objRemoto2,objRemoto);
     } 
 	
 	catch (Exception e) {
@@ -193,7 +197,9 @@ public class GUIConectarServidorGestion extends javax.swing.JFrame {
         String name = "objAnteproyectos";
         String name2 = "objUsuarios";
         NameComponent path[] = ncref.to_name(name);
+        NameComponent path2[] = ncref.to_name(name2);
         ncref.rebind(path, href);
+        ncref.rebind(path2, ref2);
 
         System.out.println("El Servidor esta listo y esperando ...");
 
@@ -201,20 +207,20 @@ public class GUIConectarServidorGestion extends javax.swing.JFrame {
         orb.run();
     }
 
-    private AnteproyectoCllbckInt obtenerReferenciaSSeguimiento(String[] vec) throws org.omg.CORBA.ORBPackage.InvalidName {
-        AnteproyectoCllbckInt ref = null;
+    private GestionSeguimientoInt obtenerReferenciaSSeguimiento(String[] vec) throws org.omg.CORBA.ORBPackage.InvalidName {
+        GestionSeguimientoInt ref = null;
         try {
             ORB orb = ORB.init(vec, null);
             org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
             NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
             String name = "objAdmin";
-            ref = (AnteproyectoCllbckInt) AnteproyectoCllbckIntHelper.narrow(ncRef.resolve_str(name));
+            ref = (GestionSeguimientoInt) GestionSeguimientoIntHelper.narrow(ncRef.resolve_str(name));
         } catch (NotFound ex) {
-            Logger.getLogger(servidorAdministrador.ServidorDeObjetos.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SSeguimientoAnteproyectos.ServidorDeObjetosSeguimiento.class.getName()).log(Level.SEVERE, null, ex);
         } catch (CannotProceed ex) {
-            Logger.getLogger(servidorAdministrador.ServidorDeObjetos.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SSeguimientoAnteproyectos.ServidorDeObjetosSeguimiento.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InvalidName ex) {
-            Logger.getLogger(servidorAdministrador.ServidorDeObjetos.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SSeguimientoAnteproyectos.ServidorDeObjetosSeguimiento.class.getName()).log(Level.SEVERE, null, ex);
         }
         return ref;
     }
