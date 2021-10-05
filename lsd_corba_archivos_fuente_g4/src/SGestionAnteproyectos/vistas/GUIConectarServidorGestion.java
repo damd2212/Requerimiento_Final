@@ -1,10 +1,28 @@
 //Presentado por: Jefferson Eduardo Campo - Danny Alberto Diaz
 package SGestionAnteproyectos.vistas;
 
-import SGestionAnteproyectos.sop_rmi.GestionAnteproyectosImpl;
-import SGestionAnteproyectos.sop_rmi.GestionUsuariosImpl;
-import SGestionAnteproyectos.utilidades.UtilidadesRegistroS;
+import SGestionAnteproyectos.GestionAnteproyectosImpl;
+import SGestionAnteproyectos.GestionUsuariosImpl;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.CosNaming.NamingContextPackage.CannotProceed;
+import org.omg.CosNaming.NamingContextPackage.InvalidName;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAHelper;
+import org.omg.PortableServer.POAManagerPackage.AdapterInactive;
+import org.omg.PortableServer.POAPackage.ServantNotActive;
+import org.omg.PortableServer.POAPackage.WrongPolicy;
+
+import sop_corba.GestionAnteproyectosInt;
+import sop_corba.GestionAnteproyectosIntHelper;
+import sop_corba.GestionUsuariosInt;
+import sop_corba.GestionUsuariosIntHelper;
 
 public class GUIConectarServidorGestion extends javax.swing.JFrame {
 
@@ -117,10 +135,13 @@ public class GUIConectarServidorGestion extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * Evento utilizado para conectar el servidor de gestion de anteproyectos
-     * @param evt 
-     */
+    
+        /**
+         * Evento utilizado para conectar el servidor de gestion de
+         * anteproyectos
+         *
+         * @param evt
+         */
     private void btnConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarActionPerformed
         // TODO add your handling code here:
         String mensajeRegistroOR;
@@ -128,30 +149,77 @@ public class GUIConectarServidorGestion extends javax.swing.JFrame {
         String mensajeRecuperarRef;
         String mensajeRegistroORUsuario;
         
-        int puerto = Integer.parseInt(jtxtFPuerto.getText());
+        try{
+        String[] vec = new String[4];
+        vec[0] = "-ORBInitialHost";
+        System.out.println("Ingrese la dirección IP donde escucha el n_s");
+        vec[1] = jtxtFDirIp.getText();
+        vec[2] = "-ORBInitialPort";
+        vec[3] = jtxtFPuerto.getText();
+        AnteproyectoImpl objRemoto = new AnteproyectoImpl();
+        AnteproyectoCllbckInt ref = obtenerReferenciaAdministrador(vec);
+        objRemoto.almacenarReferenciaRemota(ref);
+        inicializarORB(vec,objRemoto);
+    } 
+	
+	catch (Exception e) {
+		System.out.println("Error: " + e);
+		e.printStackTrace(System.out);
+	}
 
-        try {
-            GestionAnteproyectosImpl objRemoto = new GestionAnteproyectosImpl();
-            mensajeRecuperarRef = objRemoto.consultarReferenciaRemota(jtxtFDirIp.getText() , puerto);            
-            mensajeRegistroOR = UtilidadesRegistroS.RegistrarObjetoRemoto(objRemoto, jtxtFDirIp.getText() , puerto, "objetoRemotoGestion");
-            
-            GestionUsuariosImpl objRemotoUsuarios = new GestionUsuariosImpl();
-            mensajeRecuperarRefUsuario = objRemotoUsuarios.consultarReferenciaRemota(jtxtFDirIp.getText(), puerto);
-            mensajeRegistroORUsuario = UtilidadesRegistroS.RegistrarObjetoRemoto(objRemotoUsuarios, jtxtFDirIp.getText(), puerto, "objetoRemotoUsuario");
-            
-            GUIInfoServidor1 info1 = new GUIInfoServidor1();
-            info1.setVisible(true);
-            info1.setLocationRelativeTo(null);
-            String mensaje = mensajeRecuperarRef + "\n" + mensajeRegistroOR + "\n" + mensajeRecuperarRefUsuario + "\n" + mensajeRegistroORUsuario;
-            info1.jtxtAMensaje1.setText(mensaje);
-            this.dispose();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "No fue posible arrancar el NS o registrar el objeto remoto" + e.getMessage());
-            System.err.println("No fue posible arrancar el NS o registrar el objeto remoto" + e.getMessage());
-        }
-        
+	System.out.println("Servidor: Saliendo ...");
+
     }//GEN-LAST:event_btnConectarActionPerformed
 
+    
+    private void inicializarORB(String[] vec,GestionUsuariosImpl objRemoto2 , GestionAnteproyectosImpl objRemoto) throws ServantNotActive, WrongPolicy, org.omg.CORBA.ORBPackage.InvalidName, AdapterInactive, InvalidName, NotFound, CannotProceed {
+        // crea e inicia el ORB
+        ORB orb = ORB.init(vec, null);
+        POA rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+        rootpoa.the_POAManager().activate();
+
+        //*** se genera la referencia del servant
+        org.omg.CORBA.Object obj = rootpoa.servant_to_reference(objRemoto);
+        org.omg.CORBA.Object obj2 = rootpoa.servant_to_reference(objRemoto2);
+        
+        GestionAnteproyectosInt href = GestionAnteproyectosIntHelper.narrow(obj);
+        GestionUsuariosInt ref2 = GestionUsuariosIntHelper.narrow(obj2);
+
+        // se obtiene un link al name service
+        org.omg.CORBA.Object objref = orb.resolve_initial_references("NameService");
+        NamingContextExt ncref = NamingContextExtHelper.narrow(objref);
+
+        // *** se realiza el binding de la referencia del servant en el N_S ***
+        String name = "objAnteproyectos";
+        String name2 = "objUsuarios";
+        NameComponent path[] = ncref.to_name(name);
+        ncref.rebind(path, href);
+
+        System.out.println("El Servidor esta listo y esperando ...");
+
+        // esperan por las invocaciones desde los clientes
+        orb.run();
+    }
+
+    private AnteproyectoCllbckInt obtenerReferenciaSSeguimiento(String[] vec) throws org.omg.CORBA.ORBPackage.InvalidName {
+        AnteproyectoCllbckInt ref = null;
+        try {
+            ORB orb = ORB.init(vec, null);
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+            String name = "objAdmin";
+            ref = (AnteproyectoCllbckInt) AnteproyectoCllbckIntHelper.narrow(ncRef.resolve_str(name));
+        } catch (NotFound ex) {
+            Logger.getLogger(servidorAdministrador.ServidorDeObjetos.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CannotProceed ex) {
+            Logger.getLogger(servidorAdministrador.ServidorDeObjetos.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidName ex) {
+            Logger.getLogger(servidorAdministrador.ServidorDeObjetos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return ref;
+    }
+    
+    
     /**
      * @param args the command line arguments
      */
