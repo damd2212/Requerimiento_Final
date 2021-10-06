@@ -61,7 +61,6 @@ public class GUIInicioSesion extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Inicio Sesion");
         setResizable(false);
-        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setPreferredSize(new java.awt.Dimension(321, 268));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -99,7 +98,16 @@ public class GUIInicioSesion extends javax.swing.JFrame {
         jlbImgInicioSesion.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/iniciar sesion.png"))); // NOI18N
         jPanel1.add(jlbImgInicioSesion, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 290, 250));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 292, 250));
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -114,7 +122,7 @@ public class GUIInicioSesion extends javax.swing.JFrame {
         String usuario = "admin";
         String clave = "admin123";
         if (jtxtFUsuario.getText().equals(usuario) && jpassClave.getText().equals(clave)) {
-            GUIMenuAdministrador pru = new GUIMenuAdministrador(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+            GUIMenuAdministrador pru = new GUIMenuAdministrador(refGestion,refSeguimiento,refUsuarios);
             pru.setVisible(true);
             pru.setLocationRelativeTo(null);
             this.dispose();
@@ -181,7 +189,7 @@ public class GUIInicioSesion extends javax.swing.JFrame {
                             break;
                     }
                 }
-            } catch (RemoteException e) {
+            } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }

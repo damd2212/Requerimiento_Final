@@ -668,7 +668,7 @@ public class GUIMenuAdministrador extends javax.swing.JFrame {
      * @param evt evento.
      */
     private void jlbBSalirRegMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlbBSalirRegMouseClicked
-        GUIInicioSesion ini = new GUIInicioSesion(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+        GUIInicioSesion ini = new GUIInicioSesion(refGestion,refSeguimiento,refUsuarios);
         ini.setVisible(true);
         ini.setLocationRelativeTo(null);
         this.dispose();
