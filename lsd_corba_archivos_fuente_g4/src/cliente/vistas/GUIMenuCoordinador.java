@@ -3,36 +3,31 @@
  */
 package cliente.vistas;
 
-import SGestionAnteproyectos.dto.clsFormatoADTO;
-import SGestionAnteproyectos.dto.clsFormatoDDTO;
-import SGestionAnteproyectos.dto.clsFormatoBDTO;
-import SGestionAnteproyectos.dto.clsFormatoCDTO;
-import SGestionAnteproyectos.dto.clsUsuariosDTO;
-import SGestionAnteproyectos.sop_rmi.GestionAnteproyectosInt;
-import SGestionAnteproyectos.sop_rmi.GestionUsuariosInt;
-import SSeguimientoAnteproyectos.sop_rmi.GestionSeguimientoInt;
-import java.rmi.RemoteException;
+import java.awt.HeadlessException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import sop_corba.GestionAnteproyectosIntOperations;
+import sop_corba.GestionSeguimientoIntOperations;
+import sop_corba.GestionUsuariosIntOperations;
+import sop_corba.clsFormatoADTO;
+import sop_corba.clsFormatoBDTO;
+import sop_corba.clsFormatoCDTO;
+import sop_corba.clsFormatoDDTO;
+import sop_corba.clsUsuariosDTO;
 
 public class GUIMenuCoordinador extends javax.swing.JFrame {
     //Atributos
-    private static GestionUsuariosInt objRemotoUsuarios;
-    private static GestionAnteproyectosInt objRemotoAnteproyectos;
-    private static GestionSeguimientoInt objRemotoSeguimiento;
+    private static GestionAnteproyectosIntOperations refGestion;
+    private static GestionSeguimientoIntOperations refSeguimiento;
+    private static GestionUsuariosIntOperations refUsuarios;
 
-    /**
-     * Constructor Parametrizado.
-     * @param objRemoto Objeto remoto de usuario
-     * @param objRemotoA Objeto remoto de anteproyecto
-     * @param objRemotoS Objeto remoto de seguimiento
-     */
-    public GUIMenuCoordinador(GestionUsuariosInt objRemotoU, GestionAnteproyectosInt objRemotoA, GestionSeguimientoInt objRemotoS) {
+    public GUIMenuCoordinador(GestionUsuariosIntOperations objRemotoU, GestionAnteproyectosIntOperations objRemotoA, GestionSeguimientoIntOperations objRemotoS) {
         initComponents();
-        this.objRemotoUsuarios = objRemotoU;
-        this.objRemotoAnteproyectos = objRemotoA;
-        this.objRemotoSeguimiento = objRemotoS;
+        GUIMenuCoordinador.refUsuarios = objRemotoU;
+        GUIMenuCoordinador.refGestion = objRemotoA;
+        GUIMenuCoordinador.refSeguimiento = objRemotoS;
         listarEvaluadores();
         listarAntFormatoC();
         listarNoAsignados();
@@ -288,7 +283,8 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
      */
     public void listarEvaluadores() {
         try {
-            ArrayList<clsUsuariosDTO> evaluadores = objRemotoUsuarios.listarEvaluadores();
+            clsUsuariosDTO[] evaluadoresArray = refUsuarios.listarEvaluadores();
+            ArrayList<clsUsuariosDTO> evaluadores = new ArrayList(Arrays.asList(evaluadoresArray));
             DefaultTableModel modelo = new DefaultTableModel();
             if (evaluadores.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "No se tienen evaluadores disponibles", "Advertencia al listar", JOptionPane.WARNING_MESSAGE);
@@ -303,12 +299,12 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
                 tablaEvaluadores.setEnabled(false);
                 for (int i = 0; i < evaluadores.size(); i++) {
                     clsUsuariosDTO evaluador = evaluadores.get(i);
-                    Object[] obj = new Object[]{evaluador.getIdentificacion(), evaluador.getNomCompleto()};
+                    Object[] obj = new Object[]{evaluador.identificacion, evaluador.nomCompleto};
                     modelo.addRow(obj);
                 }
                 tablaEvaluadores.setModel(modelo);
             }
-        } catch (RemoteException e) {
+        } catch (HeadlessException e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -318,8 +314,9 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
      */
     public void listarNoAsignados() {
         try {
-            ArrayList<clsFormatoADTO> fsa = objRemotoAnteproyectos.listaSinAsignar();
+            clsFormatoADTO[] fsas = refGestion.listaSinAsignar();
             DefaultTableModel modelo = new DefaultTableModel();
+            ArrayList<clsFormatoADTO> fsa = new ArrayList(Arrays.asList(fsas));
             if (fsa.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "No se tienen proyectos para asignar", "Advertencia al listar", JOptionPane.WARNING_MESSAGE);
                 modelo.addColumn("Codigo Anteproyecto");
@@ -331,12 +328,12 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
                 tablaSA.setEnabled(false);
                 for (int i = 0; i < fsa.size(); i++) {
                     clsFormatoADTO formA = fsa.get(i);
-                    Object[] obj = new Object[]{formA.getCodAnteproyecto()};
+                    Object[] obj = new Object[]{formA.codAnteproyecto};
                     modelo.addRow(obj);
                 }
                 tablaSA.setModel(modelo);
             }
-        } catch (RemoteException e) {
+        } catch (HeadlessException e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -347,13 +344,14 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
      */
     public void llenarCmbEvaluadores() {
         try {
-            ArrayList<clsUsuariosDTO> evaluadores = objRemotoUsuarios.listarEvaluadores();
+            clsUsuariosDTO[] evaluadoresArray = refUsuarios.listarEvaluadores();
+            ArrayList<clsUsuariosDTO> evaluadores = new ArrayList(Arrays.asList(evaluadoresArray));
             for (int i = 0; i < evaluadores.size(); i++) {
-                String codEva = String.valueOf(evaluadores.get(i).getIdentificacion());
+                String codEva = String.valueOf(evaluadores.get(i).identificacion);
                 jcmbEvaluador1.addItem(codEva);
                 jcmbEvaluador2.addItem(codEva);
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -364,12 +362,13 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
      */
     public void llenarCmbAnteproyectos() {
         try {
-            ArrayList<clsFormatoADTO> fsa = objRemotoAnteproyectos.listaSinAsignar();
+            clsFormatoADTO[] fsas = refGestion.listaSinAsignar();
+            ArrayList<clsFormatoADTO> fsa = new ArrayList(Arrays.asList(fsas));
             for (int i = 0; i < fsa.size(); i++) {
-                String codAnte = String.valueOf(fsa.get(i).getCodAnteproyecto());
+                String codAnte = String.valueOf(fsa.get(i).codAnteproyecto);
                 jcmbAnteproyectosAsig.addItem(codAnte);
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -380,12 +379,13 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
      */
     public void llenarcmbAnteproyectosReg() {
         try {
-            ArrayList<clsFormatoCDTO> formatos = objRemotoAnteproyectos.listaAteproyectosC();
+            clsFormatoCDTO[] formatosArray = refGestion.listaAteproyectosC();
+            ArrayList<clsFormatoCDTO> formatos = new ArrayList(Arrays.asList(formatosArray));
             for (int i = 0; i < formatos.size(); i++) {
-                String codAnte = String.valueOf(formatos.get(i).getCodAnteproyecto());
+                String codAnte = String.valueOf(formatos.get(i).codAnteproyecto);
                 jcmbAnteproyectos.addItem(codAnte);
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -395,8 +395,9 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
      */
     public void listarAntFormatoC() {
         try {
-            ArrayList<clsFormatoCDTO> formatos = objRemotoAnteproyectos.listaAteproyectosC();
+            clsFormatoCDTO[] formatosArray = refGestion.listaAteproyectosC();
             DefaultTableModel modelo = new DefaultTableModel();
+            ArrayList<clsFormatoCDTO> formatos = new ArrayList(Arrays.asList(formatosArray));
             if (formatos.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "No tiene anteproyectos disponibles para registrar en el formato D", "Advertencia al listar", JOptionPane.WARNING_MESSAGE);
                 modelo.addColumn("Codigo Anteproyecto");
@@ -408,12 +409,12 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
                 tablaAnte.setEnabled(false);
                 for (int i = 0; i < formatos.size(); i++) {
                     clsFormatoCDTO formato = formatos.get(i);
-                    Object[] obj = new Object[]{formato.getCodAnteproyecto()};
+                    Object[] obj = new Object[]{formato.codAnteproyecto};
                     modelo.addRow(obj);
                 }
                 tablaAnte.setModel(modelo);
             }
-        } catch (RemoteException e) {
+        } catch (HeadlessException e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -455,14 +456,14 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
                     int codigo = Integer.parseInt(jcmbAnteproyectosAsig.getSelectedItem().toString());
                     int id1 = Integer.parseInt(jcmbEvaluador1.getSelectedItem().toString());
                     int id2 = Integer.parseInt(jcmbEvaluador2.getSelectedItem().toString());
-                    aux1 = objRemotoAnteproyectos.ConsultarAnteproyectoB(codigo);
-                    aux2 = objRemotoUsuarios.consultarEvaluador(id1);
-                    aux3 = objRemotoUsuarios.consultarEvaluador(id2);
+                    aux1 = refGestion.ConsultarAnteproyectoB(codigo);
+                    aux2 = refUsuarios.consultarEvaluador(id1);
+                    aux3 = refUsuarios.consultarEvaluador(id2);
                     if (aux1 == 1 && aux2 == 1 && aux3 == 1) {
                         clsFormatoBDTO formatoB1 = new clsFormatoBDTO(codigo, "", "", "", id1);
                         clsFormatoBDTO formatoB2 = new clsFormatoBDTO(codigo, "", "", "", id2);
-                        boolean asignar1 = objRemotoAnteproyectos.AsignarFormatoB(formatoB1);
-                        boolean asignar2 = objRemotoAnteproyectos.AsignarFormatoB(formatoB2);
+                        boolean asignar1 = refGestion.AsignarFormatoB(formatoB1);
+                        boolean asignar2 = refGestion.AsignarFormatoB(formatoB2);
                         if (asignar1 == true && asignar2 == true) {
                             JOptionPane.showMessageDialog(null, "Anteproyecto asigando a los evaluadores correctamente");
                             listarNoAsignados();
@@ -487,7 +488,7 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
                     }
                 }
             }
-        } catch (RemoteException e) {
+        } catch (HeadlessException | NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnAsignarActionPerformed
@@ -498,7 +499,7 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
      * @param evt evento.
      */
     private void jlbBSalirMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlbBSalirMouseClicked
-        GUIInicioSesion ini = new GUIInicioSesion(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+        GUIInicioSesion ini = new GUIInicioSesion(refGestion, refSeguimiento,refUsuarios);
         ini.setVisible(true);
         ini.setLocationRelativeTo(null);
         this.dispose();
@@ -510,7 +511,7 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
      * @param evt evento.
      */
     private void jlbSalirRegMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlbSalirRegMouseClicked
-        GUIInicioSesion ini = new GUIInicioSesion(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+        GUIInicioSesion ini = new GUIInicioSesion(refGestion, refSeguimiento,refUsuarios);
         ini.setVisible(true);
         ini.setLocationRelativeTo(null);
         this.dispose();
@@ -526,7 +527,7 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "El campo del codigo no puede estar vacio ","Advertencia",JOptionPane.WARNING_MESSAGE);
             } else {
                 int codigo = Integer.parseInt(jcmbAnteproyectos.getSelectedItem().toString());
-                int flujo = objRemotoAnteproyectos.VerificarAnteproyecto(codigo);
+                int flujo = refGestion.VerificarAnteproyecto(codigo);
                 if (flujo == 0) {
                     JOptionPane.showMessageDialog(null, "Anteproyecto ingresado no encontrado", "Error de busqueda", JOptionPane.ERROR_MESSAGE);
                 } else if (flujo < 4) {
@@ -534,13 +535,13 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
                 } else if (flujo == 5) {
                     JOptionPane.showMessageDialog(null, "El anteproyecto ya fue evaluado", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    int conceptoC = objRemotoAnteproyectos.ConsultarConceptoC(codigo);
+                    int conceptoC = refGestion.ConsultarConceptoC(codigo);
                     if (conceptoC == 1) {
                         String concepto = (String) jcmbConcepto.getSelectedItem();
                         String estructura = (String) jcmbEstructura.getSelectedItem();
                         String observaciones = jtxtAObs.getText();
                         clsFormatoDDTO formatoD = new clsFormatoDDTO(codigo, estructura, concepto, observaciones);
-                        boolean registroD = objRemotoAnteproyectos.RegistrarFormatoD(formatoD);
+                        boolean registroD = refGestion.RegistrarFormatoD(formatoD);
                         if (registroD == true) {
                             JOptionPane.showMessageDialog(null, "Anteproyecto registrado exitosamente en el formato D");
                             listarAntFormatoC();
@@ -554,7 +555,7 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
                     }
                 }
             }
-        } catch (RemoteException e) {
+        } catch (HeadlessException | NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnRegistrarFormatoActionPerformed
