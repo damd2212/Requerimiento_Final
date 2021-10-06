@@ -17,9 +17,9 @@ public class GUIInicioSesion extends javax.swing.JFrame {
     /*
     Atributos
      */
-    static GestionAnteproyectosIntOperations refGestion;
-    static GestionSeguimientoIntOperations refSeguimiento;
-    static GestionUsuariosIntOperations refUsuarios;
+    private static GestionAnteproyectosIntOperations refGestion;
+    private static GestionSeguimientoIntOperations refSeguimiento;
+    private static GestionUsuariosIntOperations refUsuarios;
 
     /**
      * Constructor parametrizado

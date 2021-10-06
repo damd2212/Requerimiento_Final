@@ -3,31 +3,31 @@
  */
 package cliente.vistas;
 
-import SGestionAnteproyectos.dto.clsUsuariosDTO;
-import SGestionAnteproyectos.sop_rmi.GestionAnteproyectosInt;
-import SGestionAnteproyectos.sop_rmi.GestionUsuariosInt;
-import SSeguimientoAnteproyectos.sop_rmi.GestionSeguimientoInt;
 import java.rmi.RemoteException;
 import javax.swing.JOptionPane;
+import sop_corba.GestionAnteproyectosIntOperations;
+import sop_corba.GestionSeguimientoIntOperations;
+import sop_corba.GestionUsuariosIntOperations;
+import sop_corba.clsUsuariosDTO;
 
 public class GUIMenuAdministrador extends javax.swing.JFrame {
     //Atributos
-    private static GestionUsuariosInt objRemotoUsuarios;
-    private static GestionAnteproyectosInt objRemotoAnteproyectos;
-    private static GestionSeguimientoInt objRemotoSeguimiento;
+    static GestionAnteproyectosIntOperations refGestion;
+    static GestionSeguimientoIntOperations refSeguimiento;
+    static GestionUsuariosIntOperations refUsuarios;
     private int numDocumento;
     
     /**
      * Constructor parametrizado.
-     * @param objRemoto objeto remoto de usuario
-     * @param objRemotoA objeto remoto de anteproyecto
-     * @param objRemotoS objeto remoto de seguimiento
+     * @param refGestion
+     * @param refSeguimiento
+     * @param refUsuarios
      */
-    public GUIMenuAdministrador(GestionUsuariosInt objRemoto, GestionAnteproyectosInt objRemotoA, GestionSeguimientoInt objRemotoS) {
+    public GUIMenuAdministrador(GestionAnteproyectosIntOperations refGestion, GestionSeguimientoIntOperations refSeguimiento, GestionUsuariosIntOperations refUsuarios) {
         initComponents();
-        this.objRemotoUsuarios = objRemoto;
-        this.objRemotoAnteproyectos = objRemotoA;
-        this.objRemotoSeguimiento = objRemotoS;
+        GUIMenuAdministrador.refGestion = refGestion;
+        GUIMenuAdministrador.refSeguimiento = refSeguimiento;
+        GUIMenuAdministrador.refUsuarios = refUsuarios;
         jtxtFnomCompletoMod.setEnabled(false);
         jcmbRolMod.setEnabled(false);
         jcmbProgramasMod.setEnabled(false);
@@ -416,7 +416,7 @@ public class GUIMenuAdministrador extends javax.swing.JFrame {
                                 String rol = (String) jcmbRolMod.getSelectedItem();
                                 String departamento = (String)jcmbProgramasMod.getSelectedItem();//jtxtFDepartamentoMod.getText();
                                 clsUsuariosDTO objUsuario = new clsUsuariosDTO(numDocumento, nombre, rol, departamento, user, Pass, false);
-                                boolean mod = objRemotoUsuarios.ModificarUsuario(objUsuario);
+                                boolean mod = refUsuarios.ModificarUsuario(objUsuario);
                                 if (mod == true) {
                                     JOptionPane.showMessageDialog(null, "Usuario Actualizado exitosamente");
                                     limpiarActualizar();
@@ -432,7 +432,7 @@ public class GUIMenuAdministrador extends javax.swing.JFrame {
                     }
                 }
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnActualizarActionPerformed
@@ -473,11 +473,11 @@ public class GUIMenuAdministrador extends javax.swing.JFrame {
             } else {
                 int id = Integer.parseInt(jtxtFIDMod.getText());
                 clsUsuariosDTO usuario = null;
-                usuario = objRemotoUsuarios.ConsultarUsuario(id);
+                usuario = refUsuarios.ConsultarUsuario(id);
                 if (usuario == null) {
                     JOptionPane.showMessageDialog(null, "ID ingresado NO existente en el sistema", "Error al buscar usuario", JOptionPane.ERROR_MESSAGE);
                     limpiarActualizar();
-                } else if (usuario.isSesion()) {
+                } else if (usuario.sesion) {
                     JOptionPane.showMessageDialog(null, "Debe cerrar la sesion del usuario para actualizar la informacion", "Error al recuperar usuario", JOptionPane.ERROR_MESSAGE);
                 } else {
                     numDocumento = Integer.parseInt(jtxtFIDMod.getText());
@@ -486,14 +486,14 @@ public class GUIMenuAdministrador extends javax.swing.JFrame {
                     jcmbProgramasMod.setEnabled(true);
                     jpassFClaveMod.setEnabled(true);
                     btnActualizar.setEnabled(true);
-                    jtxtFnomCompletoMod.setText(usuario.getNomCompleto());
-                    jcmbRolMod.setSelectedItem(usuario.getRole());
-                    jcmbProgramasMod.setSelectedItem(usuario.getDepartamento());
-                    jtxtFUsuarioMod.setText(usuario.getUsuario());
-                    jpassFClaveMod.setText(usuario.getClave());
+                    jtxtFnomCompletoMod.setText(usuario.nomCompleto);
+                    jcmbRolMod.setSelectedItem(usuario.role);
+                    jcmbProgramasMod.setSelectedItem(usuario.departamento);
+                    jtxtFUsuarioMod.setText(usuario.usuario);
+                    jpassFClaveMod.setText(usuario.clave);
                 }
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jlbBuscarActMouseClicked
@@ -503,7 +503,7 @@ public class GUIMenuAdministrador extends javax.swing.JFrame {
      * @param evt evento.
      */
     private void jlbBSalirActMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlbBSalirActMouseClicked
-        GUIInicioSesion ini = new GUIInicioSesion(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+        GUIInicioSesion ini = new GUIInicioSesion(refGestion, refSeguimiento, refUsuarios);
         ini.setVisible(true);
         ini.setLocationRelativeTo(null);
         this.dispose();
@@ -546,18 +546,18 @@ public class GUIMenuAdministrador extends javax.swing.JFrame {
             } else {
                 int id = Integer.parseInt(jtxtFIDBuscarCon.getText());
                 clsUsuariosDTO usuario = null;
-                usuario = objRemotoUsuarios.ConsultarUsuario(id);
+                usuario = refUsuarios.ConsultarUsuario(id);
                 if (usuario == null) {
                     JOptionPane.showMessageDialog(null, "ID ingresado NO existente en el sistema", "Error la consultar usuario", JOptionPane.ERROR_MESSAGE);
                     limpiarConssultar();
                 } else {
-                    jlbnomCompleto.setText(usuario.getNomCompleto());
-                    jlbRol.setText(usuario.getRole());
-                    jlbDepartamento.setText(usuario.getDepartamento());
-                    jlbUsuario.setText(usuario.getUsuario());
+                    jlbnomCompleto.setText(usuario.nomCompleto);
+                    jlbRol.setText(usuario.role);
+                    jlbDepartamento.setText(usuario.departamento);
+                    jlbUsuario.setText(usuario.usuario);
                 }
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jlbBBuscarConMouseClicked
@@ -568,7 +568,7 @@ public class GUIMenuAdministrador extends javax.swing.JFrame {
      */
     private void jlbBSalirMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlbBSalirMouseClicked
         // TODO add your handling code here:
-        GUIInicioSesion ini = new GUIInicioSesion(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+        GUIInicioSesion ini = new GUIInicioSesion(refGestion,refSeguimiento,refUsuarios);
         ini.setVisible(true);
         ini.setLocationRelativeTo(null);
         this.dispose();
@@ -599,7 +599,7 @@ public class GUIMenuAdministrador extends javax.swing.JFrame {
             } else {
                 String role = (String) jcmbRolReg.getSelectedItem();
                 if (role.equals("Decano")) {
-                    int numDecano = objRemotoUsuarios.validarDecano();
+                    int numDecano = refUsuarios.validarDecano();
                     if (numDecano > 0) {
                         JOptionPane.showMessageDialog(null, "Solo puede existir un decano para esta facultad", "Error de registro", JOptionPane.ERROR_MESSAGE);
                     } else {
@@ -609,7 +609,7 @@ public class GUIMenuAdministrador extends javax.swing.JFrame {
                     registrarUsuario();
                 }
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnRegistraarActionPerformed
@@ -632,13 +632,13 @@ public class GUIMenuAdministrador extends javax.swing.JFrame {
                     if (vUsuario == true) {
                         if (vPass == true) {
                             int id = Integer.parseInt(jtxtFIDReg.getText());
-                            int eUsuario = objRemotoUsuarios.ValidarRegistro(id, usuario);
+                            int eUsuario = refUsuarios.ValidarRegistro(id, usuario);
                             if (eUsuario == 0) {
                                 String nombre = jtxtFnomCompletoReg.getText();
                                 String rol = (String) jcmbRolReg.getSelectedItem();
                                 String departamento = (String)jcmbProgramasReg.getSelectedItem();//jtxtFDepartamentoReg.getText();
                                 clsUsuariosDTO objUsuario = new clsUsuariosDTO(id, nombre, rol, departamento, usuario, Pass, false);
-                                boolean registro = objRemotoUsuarios.RegistrarUsuario(objUsuario);
+                                boolean registro = refUsuarios.RegistrarUsuario(objUsuario);
                                 if (registro == true) {
                                     JOptionPane.showMessageDialog(null, "Usuario registrado exitosamente");
                                     limpiarRegistro();
@@ -658,7 +658,7 @@ public class GUIMenuAdministrador extends javax.swing.JFrame {
                     }
                 }
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
