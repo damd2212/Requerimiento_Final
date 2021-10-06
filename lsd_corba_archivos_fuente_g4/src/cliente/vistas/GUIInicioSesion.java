@@ -23,6 +23,7 @@ public class GUIInicioSesion extends javax.swing.JFrame {
 
     /**
      * Constructor parametrizado
+     *
      * @param refGestion
      * @param refSeguimiento
      * @param refUsuarios
@@ -121,8 +122,11 @@ public class GUIInicioSesion extends javax.swing.JFrame {
     private void btnIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarActionPerformed
         String usuario = "admin";
         String clave = "admin123";
-        if (jtxtFUsuario.getText().equals(usuario) && jpassClave.getText().equals(clave)) {
-            GUIMenuAdministrador pru = new GUIMenuAdministrador(refGestion,refSeguimiento,refUsuarios);
+
+        if (jtxtFUsuario.getText().equals("") || jpassClave.getText().equals("")) {
+            JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        }else if (jtxtFUsuario.getText().equals(usuario) && jpassClave.getText().equals(clave)) {
+            GUIMenuAdministrador pru = new GUIMenuAdministrador(refGestion, refSeguimiento, refUsuarios);
             pru.setVisible(true);
             pru.setLocationRelativeTo(null);
             this.dispose();
@@ -130,14 +134,12 @@ public class GUIInicioSesion extends javax.swing.JFrame {
             try {
                 String user = jtxtFUsuario.getText();
                 String pass = new String(jpassClave.getPassword());
-                clsUsuariosDTO objUsuario = null;
-                objUsuario = refUsuarios.IniciarSesion(user, pass);
-                if (objUsuario == null) {
-                    if (user.equals("") || pass.equals("")) {
-                        JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Credenciales Incorrectas.", "Error al validar credenciales", JOptionPane.ERROR_MESSAGE);
-                    }
+                clsUsuariosDTO objUsuario = refUsuarios.IniciarSesion(user, pass);
+                //retornar un valor en -1 para reconocer el objeto
+                if (objUsuario.identificacion == -1) {
+
+                    JOptionPane.showMessageDialog(null, "Credenciales Incorrectas.", "Error al validar credenciales", JOptionPane.ERROR_MESSAGE);
+
                 } else if (objUsuario.sesion) {
                     JOptionPane.showMessageDialog(null, "Ya existe una sesion abierta para este usuario", "Error al iniciar sesion", JOptionPane.ERROR_MESSAGE);
                 } else {
@@ -149,7 +151,7 @@ public class GUIInicioSesion extends javax.swing.JFrame {
                         case "Director":
                             int idDirector = objUsuario.identificacion;
                             refUsuarios.IniSesion(idDirector);
-                            GUIMenuDirector menuDirector = new GUIMenuDirector(refGestion,refSeguimiento,refUsuarios, idDirector,nomUsuario);
+                            GUIMenuDirector menuDirector = new GUIMenuDirector(refGestion, refSeguimiento, refUsuarios, idDirector, nomUsuario);
                             menuDirector.setVisible(true);
                             menuDirector.setLocationRelativeTo(null);
                             this.dispose();
@@ -157,28 +159,28 @@ public class GUIInicioSesion extends javax.swing.JFrame {
 
                         case "Evaluador":
                             int idEvaluador = objUsuario.identificacion;
-                            GUIMenuEvaluador menuEvaluador = new GUIMenuEvaluador(refGestion,refSeguimiento,refUsuarios, idEvaluador);
+                            GUIMenuEvaluador menuEvaluador = new GUIMenuEvaluador(refGestion, refSeguimiento, refUsuarios, idEvaluador);
                             menuEvaluador.setVisible(true);
                             menuEvaluador.setLocationRelativeTo(null);
                             this.dispose();
                             break;
 
                         case "Jefe Departamento":
-                            GUIMenuJefeDepartamento menuJDepartamento = new GUIMenuJefeDepartamento(refGestion,refSeguimiento,refUsuarios);
+                            GUIMenuJefeDepartamento menuJDepartamento = new GUIMenuJefeDepartamento(refGestion, refSeguimiento, refUsuarios);
                             menuJDepartamento.setVisible(true);
                             menuJDepartamento.setLocationRelativeTo(null);
                             this.dispose();
                             break;
 
                         case "Coordinador":
-                            GUIMenuCoordinador menuCoordinador = new GUIMenuCoordinador(refGestion,refSeguimiento,refUsuarios);
+                            GUIMenuCoordinador menuCoordinador = new GUIMenuCoordinador(refGestion, refSeguimiento, refUsuarios);
                             menuCoordinador.setVisible(true);
                             menuCoordinador.setLocationRelativeTo(null);
                             this.dispose();
                             break;
 
                         case "Decano":
-                            GUIMenuDecano menuDecano = new GUIMenuDecano(refGestion,refSeguimiento,refUsuarios);
+                            GUIMenuDecano menuDecano = new GUIMenuDecano(refGestion, refSeguimiento, refUsuarios);
                             menuDecano.setVisible(true);
                             menuDecano.setLocationRelativeTo(null);
                             this.dispose();

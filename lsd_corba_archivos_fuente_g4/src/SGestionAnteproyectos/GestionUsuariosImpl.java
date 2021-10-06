@@ -21,7 +21,7 @@ public class GestionUsuariosImpl extends GestionUsuariosIntPOA {
     @Override
     public clsUsuariosDTO IniciarSesion(String prmUsuario, String prmClave) {
         System.out.println("==Iniciar Sesion==");
-        clsUsuariosDTO objUsuario = null;
+        clsUsuariosDTO objUsuario = new clsUsuariosDTO(-1, "", "", "", "", "", false);
         for (int i = 0; i < this.usuarios.size(); i++) {
             if (this.usuarios.get(i).usuario.equals(prmUsuario) && this.usuarios.get(i).clave.equals(prmClave)) {
                 objUsuario = this.usuarios.get(i);
@@ -35,7 +35,7 @@ public class GestionUsuariosImpl extends GestionUsuariosIntPOA {
     public clsUsuariosDTO ConsultarUsuario(int prmIdentificacion) {
 
         System.out.println("==Consultar Usuario==");
-        clsUsuariosDTO objUsuario = null;
+        clsUsuariosDTO objUsuario = new clsUsuariosDTO(-1, "", "", "", "", "", false);
         if (this.usuarios.isEmpty()) {
             return null;
         }

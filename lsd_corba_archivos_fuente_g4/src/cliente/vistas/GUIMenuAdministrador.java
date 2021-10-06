@@ -480,9 +480,9 @@ public class GUIMenuAdministrador extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "El campo del ID No puede estar vacio", "Advertencia", JOptionPane.WARNING_MESSAGE);
             } else {
                 int id = Integer.parseInt(jtxtFIDMod.getText());
-                clsUsuariosDTO usuario = null;
-                usuario = refUsuarios.ConsultarUsuario(id);
-                if (usuario == null) {
+                clsUsuariosDTO usuario = refUsuarios.ConsultarUsuario(id);
+                
+                if (usuario.identificacion == -1 ) {
                     JOptionPane.showMessageDialog(null, "ID ingresado NO existente en el sistema", "Error al buscar usuario", JOptionPane.ERROR_MESSAGE);
                     limpiarActualizar();
                 } else if (usuario.sesion) {
@@ -553,9 +553,9 @@ public class GUIMenuAdministrador extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "El campo del ID No puede estar vacio", "Advertencia", JOptionPane.WARNING_MESSAGE);
             } else {
                 int id = Integer.parseInt(jtxtFIDBuscarCon.getText());
-                clsUsuariosDTO usuario = null;
-                usuario = refUsuarios.ConsultarUsuario(id);
-                if (usuario == null) {
+                clsUsuariosDTO usuario = refUsuarios.ConsultarUsuario(id);
+                
+                if (usuario.identificacion == -1) {
                     JOptionPane.showMessageDialog(null, "ID ingresado NO existente en el sistema", "Error la consultar usuario", JOptionPane.ERROR_MESSAGE);
                     limpiarConssultar();
                 } else {
