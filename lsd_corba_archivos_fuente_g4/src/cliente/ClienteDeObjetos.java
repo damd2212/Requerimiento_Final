@@ -1,6 +1,8 @@
 
 package cliente;
 
+import cliente.vistas.GUIConectarCliente;
+
 
 public class ClienteDeObjetos {
 
@@ -9,6 +11,9 @@ public class ClienteDeObjetos {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        GUIConectarCliente conectarCliente = new GUIConectarCliente();
+        conectarCliente.setVisible(true);
+        conectarCliente.setLocationRelativeTo(null);
     }
     
 }

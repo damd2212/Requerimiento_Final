@@ -173,9 +173,9 @@ public class GUIConectarServidorGestion extends javax.swing.JFrame {
 
         //*** se genera la referencia del servant
         org.omg.CORBA.Object obj = rootpoa.servant_to_reference(objRemoto);
-        org.omg.CORBA.Object obj2 = rootpoa.servant_to_reference(objRemoto2);
-
         GestionAnteproyectosInt href = GestionAnteproyectosIntHelper.narrow(obj);
+        
+        org.omg.CORBA.Object obj2 = rootpoa.servant_to_reference(objRemoto2);
         GestionUsuariosInt ref2 = GestionUsuariosIntHelper.narrow(obj2);
 
         // se obtiene un link al name service
@@ -186,8 +186,8 @@ public class GUIConectarServidorGestion extends javax.swing.JFrame {
         String name = "objAnteproyectos";
         String name2 = "objUsuarios";
         NameComponent path[] = ncref.to_name(name);
-        NameComponent path2[] = ncref.to_name(name2);
         ncref.rebind(path, href);
+        NameComponent path2[] = ncref.to_name(name2);
         ncref.rebind(path2, ref2);
 
         System.out.println("El Servidor esta listo y esperando ...");
