@@ -179,7 +179,7 @@ public class GUIInicioSesion extends javax.swing.JFrame {
                             break;
 
                         case "Decano":
-                            GUIMenuDecano menuDecano = new GUIMenuDecano(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+                            GUIMenuDecano menuDecano = new GUIMenuDecano(refGestion,refSeguimiento,refUsuarios);
                             menuDecano.setVisible(true);
                             menuDecano.setLocationRelativeTo(null);
                             this.dispose();

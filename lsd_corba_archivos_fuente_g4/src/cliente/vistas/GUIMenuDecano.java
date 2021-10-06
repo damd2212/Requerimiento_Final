@@ -3,27 +3,26 @@
  */
 package cliente.vistas;
 
-import SGestionAnteproyectos.sop_rmi.GestionAnteproyectosInt;
-import SGestionAnteproyectos.sop_rmi.GestionUsuariosInt;
-import SSeguimientoAnteproyectos.dto.clsFormatosDTO2;
-import SSeguimientoAnteproyectos.dto.clsResolucionDTO;
-import SSeguimientoAnteproyectos.sop_rmi.GestionSeguimientoImpl;
-import SSeguimientoAnteproyectos.sop_rmi.GestionSeguimientoInt;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import sop_corba.GestionAnteproyectosIntOperations;
+import sop_corba.GestionSeguimientoIntOperations;
+import sop_corba.GestionUsuariosIntOperations;
+import sop_corba.clsFormatosDTO;
+import sop_corba.clsResolucionDTO;
 
 public class GUIMenuDecano extends javax.swing.JFrame {
     //Atributos
-    private static GestionUsuariosInt objRemotoUsuarios;
-    private static GestionAnteproyectosInt objRemotoAnteproyectos;
-    private static GestionSeguimientoInt objRemotoSeguimiento;
+    static GestionAnteproyectosIntOperations refGestion;
+    static GestionSeguimientoIntOperations refSeguimiento;
+    static GestionUsuariosIntOperations refUsuarios;
 
     /**
      * Constructor vacio.
@@ -32,15 +31,15 @@ public class GUIMenuDecano extends javax.swing.JFrame {
 
     /**
      * Constructor parametrizado
-     * @param prmRemotoU Objeto remoto de usuario
-     * @param prmRemotoA Objeto remoto de anteproyecto
-     * @param prmRemotoS Objeto remoto de seguimiento
+     * @param refGestion
+     * @param refSeguimiento
+     * @param refUsuarios
      */
-    public GUIMenuDecano(GestionUsuariosInt prmRemotoU, GestionAnteproyectosInt prmRemotoA, GestionSeguimientoInt prmRemotoS) {
+    public GUIMenuDecano(GestionAnteproyectosIntOperations refGestion, GestionSeguimientoIntOperations refSeguimiento, GestionUsuariosIntOperations refUsuarios) {
         initComponents();
-        this.objRemotoUsuarios = prmRemotoU;
-        this.objRemotoSeguimiento = prmRemotoS;
-        this.objRemotoAnteproyectos = prmRemotoA;
+        GUIMenuAdministrador.refGestion = refGestion;
+        GUIMenuAdministrador.refSeguimiento = refSeguimiento;
+        GUIMenuAdministrador.refUsuarios = refUsuarios;
         listarAntSinResolucion();
         llenaCmbAnteproyectos();
     }
@@ -379,9 +378,7 @@ public class GUIMenuDecano extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 877, Short.MAX_VALUE)
         );
 
         pack();
@@ -399,14 +396,14 @@ public class GUIMenuDecano extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Campos vacios, debe completar el codigo del anteproyecto","Advertencia",JOptionPane.WARNING_MESSAGE);
             } else {
                 int idCodigo = Integer.parseInt(jcmbAnteproyectos.getSelectedItem().toString());
-                ArrayList<clsFormatosDTO2> listaFormatos = obtenerLista();
+                ArrayList<clsFormatosDTO> listaFormatos = obtenerLista();
                 for (int i = 0; i < listaFormatos.size(); i++) {
-                    if (listaFormatos.get(i).getCodAnteproyecto() == idCodigo) {
+                    if (listaFormatos.get(i).codAnteproyecto == idCodigo) {
                         bandera = true;
                     }
                 }
                 if (bandera) {
-                    boolean registro = objRemotoSeguimiento.RegistrarResolucion(idCodigo);
+                    boolean registro = refSeguimiento.RegistrarResolucion(idCodigo);
                     if (registro == true) {
                         JOptionPane.showMessageDialog(null, "registrado exitosamente");
                         listarAntSinResolucion();
@@ -417,9 +414,9 @@ public class GUIMenuDecano extends javax.swing.JFrame {
                     }
                 } else {
                     boolean band = false;
-                    ArrayList<clsFormatosDTO2> listaFormatos2 = objRemotoSeguimiento.consultarHistorial();
-                    for (int i = 0; i < listaFormatos2.size(); i++) {
-                        if (listaFormatos2.get(i).getCodAnteproyecto() == idCodigo) {
+                    clsFormatosDTO[] listaFormatos2 = refSeguimiento.consultarHistorial();
+                    for (int i = 0; i < listaFormatos2.length; i++) {
+                        if (listaFormatos2[i].codAnteproyecto == idCodigo) {
                             JOptionPane.showMessageDialog(null, "Este anteproyecto ya fue registrado", "Error en la busqueda", JOptionPane.ERROR_MESSAGE);
                             band = true;
                             break;
@@ -430,10 +427,8 @@ public class GUIMenuDecano extends javax.swing.JFrame {
                     }
                 }
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
@@ -444,7 +439,8 @@ public class GUIMenuDecano extends javax.swing.JFrame {
      */
     private void btnConsultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarActionPerformed
         try {
-            ArrayList<clsResolucionDTO> listaResolucion = objRemotoSeguimiento.consultarResoluciones();
+            clsResolucionDTO[] arrayResol = refSeguimiento.consultarResoluciones();
+            ArrayList<clsResolucionDTO> listaResolucion = new ArrayList(Arrays.asList(arrayResol));
             DefaultTableModel modelo = new DefaultTableModel();
             if (listaResolucion.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "No hay anteproyectos aprobados", "Advertencia", JOptionPane.WARNING_MESSAGE);
@@ -460,16 +456,12 @@ public class GUIMenuDecano extends javax.swing.JFrame {
                 modelo.addColumn("Codigo");
                 for (int i = 0; i < listaResolucion.size(); i++) {
                     clsResolucionDTO resolucion = listaResolucion.get(i);
-                    Object[] obj = new Object[]{resolucion.getNumResolucion(), resolucion.getFecha(), resolucion.getCodAnteproyecto()};
+                    Object[] obj = new Object[]{resolucion.numResolucion, resolucion.fecha, resolucion.codAnteproyecto};
                     modelo.addRow(obj);
                 }
                 pnlHistorialRes.setModel(modelo);
             }
-        } catch (RemoteException ex) {
-            Logger.getLogger(GUIMenuDecano.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(GUIMenuDecano.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        }catch (Exception ex) {
             Logger.getLogger(GUIMenuDecano.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnConsultarActionPerformed
@@ -480,7 +472,7 @@ public class GUIMenuDecano extends javax.swing.JFrame {
      * @param evt evento.
      */
     private void jlbBSalirRegMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlbBSalirRegMouseClicked
-        GUIInicioSesion ini = new GUIInicioSesion(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+        GUIInicioSesion ini = new GUIInicioSesion(refGestion,refSeguimiento,refUsuarios);
         ini.setVisible(true);
         ini.setLocationRelativeTo(null);
         this.dispose();
@@ -492,7 +484,7 @@ public class GUIMenuDecano extends javax.swing.JFrame {
      * @param evt evento.
      */
     private void jlbBSalirConResMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlbBSalirConResMouseClicked
-        GUIInicioSesion ini = new GUIInicioSesion(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+        GUIInicioSesion ini = new GUIInicioSesion(refGestion,refSeguimiento,refUsuarios);
         ini.setVisible(true);
         ini.setLocationRelativeTo(null);
         this.dispose();
@@ -504,7 +496,7 @@ public class GUIMenuDecano extends javax.swing.JFrame {
      * @param evt 
      */
     private void jLabel7MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel7MouseClicked
-        GUIInicioSesion ini = new GUIInicioSesion(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+        GUIInicioSesion ini = new GUIInicioSesion(refGestion,refSeguimiento,refUsuarios);
         ini.setVisible(true);
         ini.setLocationRelativeTo(null);
         this.dispose();
@@ -529,7 +521,8 @@ public class GUIMenuDecano extends javax.swing.JFrame {
      * @throws IOException en caso de que no pueda leer el txt.
      */
     private void listarAnteproyectos() throws FileNotFoundException, IOException {
-        ArrayList<clsFormatosDTO2> listaFormatos = objRemotoSeguimiento.consultarHistorial();
+        clsFormatosDTO[] arrayForms = refSeguimiento.consultarHistorial();
+        ArrayList<clsFormatosDTO> listaFormatos = new ArrayList<>(Arrays.asList(arrayForms));
         DefaultTableModel modelo = new DefaultTableModel();
         DefaultTableModel modelo1 = new DefaultTableModel();
         DefaultTableModel modelo2 = new DefaultTableModel();
@@ -596,19 +589,19 @@ public class GUIMenuDecano extends javax.swing.JFrame {
             modelo3.addColumn("Estructura");
             modelo3.addColumn("Observaciones");
             for (int i = 0; i < listaFormatos.size(); i++) {
-                clsFormatosDTO2 formatos = listaFormatos.get(i);
-                Object[] obj = new Object[]{formatos.getCodAnteproyecto(), formatos.getFormatoA().getNomPrograma(),
-                    formatos.getFormatoA().getTituloAnteproyecto(), formatos.getFormatoA().getCodEstudiante1(),
-                    formatos.getFormatoA().getNomEstudiante1(), formatos.getFormatoA().getCodEstudiante2(), formatos.getFormatoA().getNomEstudiante2(),
-                    formatos.getFormatoA().getNomDirector(), formatos.getFormatoA().getNomCoDirector(), formatos.getFormatoA().getObjetivosAnteproyecto()};
+                clsFormatosDTO formatos = listaFormatos.get(i);
+                Object[] obj = new Object[]{formatos.codAnteproyecto, formatos.formatoA.nomPrograma,
+                    formatos.formatoA.tituloAnteproyecto, formatos.formatoA.codEstudiante1,
+                    formatos.formatoA.nomEstudiante1, formatos.formatoA.codEstudiante2, formatos.formatoA.nomEstudiante2,
+                    formatos.formatoA.nomDirector, formatos.formatoA.nomCoDirector, formatos.formatoA.objetivosAnteproyecto};
                 modelo.addRow(obj);
-                Object[] obj2 = new Object[]{formatos.getFormatoB1().getCodAnteproyecto(), formatos.getFormatoB1().getIdEvaluador(), formatos.getFormatoB1().getConcepto(), formatos.getFormatoB1().getFechaEvaluacion(),
-                    formatos.getFormatoB1().getObservaciones(), formatos.getFormatoB2().getIdEvaluador(), formatos.getFormatoB2().getConcepto(), formatos.getFormatoB2().getFechaEvaluacion(),
-                    formatos.getFormatoB2().getObservaciones()};
+                Object[] obj2 = new Object[]{formatos.formatoB1.codAnteproyecto, formatos.formatoB1.idEvaluador, formatos.formatoB1.concepto, formatos.formatoB1.fechaEvaluacion,
+                    formatos.formatoB1.observaciones, formatos.formateB2.idEvaluador, formatos.formateB2.concepto, formatos.formateB2.fechaEvaluacion,
+                    formatos.formateB2.observaciones};
                 modelo1.addRow(obj2);
-                Object[] obj3 = new Object[]{formatos.getFormatoC().getCodAnteproyecto(), formatos.getFormatoC().getConceptoDepto(), formatos.getFormatoC().getEstructura(), formatos.getFormatoC().getObservaciones()};
+                Object[] obj3 = new Object[]{formatos.formatoC.codAnteproyecto, formatos.formatoC.conceptoDepto, formatos.formatoC.estructura, formatos.formatoC.observaciones};
                 modelo2.addRow(obj3);
-                Object[] obj4 = new Object[]{formatos.getFormatoD().getCodAnteproyecto(), formatos.getFormatoD().getConceptoCoodinador(), formatos.getFormatoD().getEstructura(), formatos.getFormatoD().getObservaciones()};
+                Object[] obj4 = new Object[]{formatos.formatoD.codAnteproyecto, formatos.formatoD.conceptoCoodinador, formatos.formatoD.estructura, formatos.formatoD.observaciones};
                 modelo3.addRow(obj4);
             }
             pnlFormatoA.setModel(modelo);
@@ -622,23 +615,21 @@ public class GUIMenuDecano extends javax.swing.JFrame {
      * Método que obtiene la lista de anteproyectos los cuales ya tienen registrada una resolución. 
      * @return 
      */
-    private ArrayList<clsFormatosDTO2> obtenerLista() {
-        ArrayList<clsFormatosDTO2> listaFormatos = new ArrayList();
+    private ArrayList<clsFormatosDTO> obtenerLista() {
+        
+        clsFormatosDTO[] arrayFormatos = refSeguimiento.consultarHistorial();
+        ArrayList<clsFormatosDTO> listaFormatos = new ArrayList(Arrays.asList(arrayFormatos));   
         try {
-            listaFormatos = objRemotoSeguimiento.consultarHistorial();
-            ArrayList<clsResolucionDTO> listaResolucion = objRemotoSeguimiento.consultarResoluciones();
+            clsResolucionDTO[] arrayResoluciones = refSeguimiento.consultarResoluciones();
+            ArrayList<clsResolucionDTO> listaResolucion = new ArrayList(Arrays.asList(arrayResoluciones));
             for (int j = 0; j < listaResolucion.size(); j++) {
                 for (int i = 0; i < listaFormatos.size(); i++) {
-                    if (listaFormatos.get(i).getCodAnteproyecto() == Integer.parseInt(listaResolucion.get(j).getCodAnteproyecto())) {
+                    if (listaFormatos.get(i).codAnteproyecto == Integer.parseInt(listaResolucion.get(j).codAnteproyecto)) {
                         listaFormatos.remove(i);
                     }
                 }
             }
-        } catch (RemoteException ex) {
-            Logger.getLogger(GUIMenuDecano.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(GUIMenuDecano.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        }catch (Exception ex) {
             Logger.getLogger(GUIMenuDecano.class.getName()).log(Level.SEVERE, null, ex);
         }
         return listaFormatos;
@@ -648,9 +639,9 @@ public class GUIMenuDecano extends javax.swing.JFrame {
      * Método que completa los campos de combo box para que puedan ser seleccionados por el usuario.
      */
     public void llenaCmbAnteproyectos() {
-        ArrayList<clsFormatosDTO2> listaFormatos = obtenerLista();
+        ArrayList<clsFormatosDTO> listaFormatos = obtenerLista();
         for (int i = 0; i < listaFormatos.size(); i++) {
-            String codAnte = String.valueOf(listaFormatos.get(i).getCodAnteproyecto());
+            String codAnte = String.valueOf(listaFormatos.get(i).codAnteproyecto);
             jcmbAnteproyectos.addItem(codAnte);
         }
     }
@@ -659,7 +650,7 @@ public class GUIMenuDecano extends javax.swing.JFrame {
      * Método que lista los anteproyectos que no tienen resolución. 
      */
     private void listarAntSinResolucion() {
-        ArrayList<clsFormatosDTO2> listaFormatos = obtenerLista();
+        ArrayList<clsFormatosDTO> listaFormatos = obtenerLista();
         DefaultTableModel modelo = new DefaultTableModel();
         if (listaFormatos.isEmpty()) {
             JOptionPane.showMessageDialog(null, "No hay anteproyectos aprobados", "Advertencia", JOptionPane.WARNING_MESSAGE);
@@ -674,8 +665,8 @@ public class GUIMenuDecano extends javax.swing.JFrame {
             modelo.addColumn("Titulo");
             modelo.addColumn("Programa");
             for (int i = 0; i < listaFormatos.size(); i++) {
-                clsFormatosDTO2 formatos = listaFormatos.get(i);
-                Object[] obj = new Object[]{formatos.getCodAnteproyecto(), formatos.getFormatoA().getTituloAnteproyecto(), formatos.getFormatoA().getNomPrograma()};
+                clsFormatosDTO formatos = listaFormatos.get(i);
+                Object[] obj = new Object[]{formatos.codAnteproyecto, formatos.formatoA.tituloAnteproyecto, formatos.formatoA.nomPrograma};
                 modelo.addRow(obj);
             }
             pnlHistorial.setModel(modelo);
