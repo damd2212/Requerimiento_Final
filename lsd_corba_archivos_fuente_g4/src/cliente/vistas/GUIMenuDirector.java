@@ -3,37 +3,36 @@
  */
 package cliente.vistas;
 
-import SGestionAnteproyectos.dto.clsFormatoADTO;
-import SGestionAnteproyectos.sop_rmi.GestionAnteproyectosInt;
-import SGestionAnteproyectos.sop_rmi.GestionUsuariosInt;
-import SSeguimientoAnteproyectos.sop_rmi.GestionSeguimientoInt;
-
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.JOptionPane;
+import sop_corba.GestionAnteproyectosIntOperations;
+import sop_corba.GestionSeguimientoIntOperations;
+import sop_corba.GestionUsuariosIntOperations;
 
 public class GUIMenuDirector extends javax.swing.JFrame {
     //Atributos
-    private static GestionAnteproyectosInt objRemotoAnteproyectos;
-    private static GestionUsuariosInt objRemotoUsuarios;
-    private static GestionSeguimientoInt objRemotoSeguimiento;
+    private static GestionAnteproyectosIntOperations refGestion;
+    private static GestionSeguimientoIntOperations refSeguimiento;
+    private static GestionUsuariosIntOperations refUsuarios;
     private static int codigo;
     private int idDirector;
     private String nomCompleto;
 
     /**
      * Constructor Parametrizado.
-     * @param objRemoto Objeto remoto de usuario
-     * @param objRemotoA Objeto remoto de anteproyecto
-     * @param objRemotoS Objeto remoto de seguimiento
+     * @param refGestion
+     * @param refSeguimiento
+     * @param refUsuarios
      * @param idDirector Identificación del director
      * @param nomCompleto Nombre del director
      */
-    public GUIMenuDirector(GestionUsuariosInt objRemoto, GestionAnteproyectosInt objRemotoA, GestionSeguimientoInt objRemotoS, int idDirector, String nomCompleto) {
+    public GUIMenuDirector(GestionAnteproyectosIntOperations refGestion, GestionSeguimientoIntOperations refSeguimiento, GestionUsuariosIntOperations refUsuarios, int idDirector, String nomCompleto) {
         initComponents();
-        this.objRemotoUsuarios = objRemoto;
-        this.objRemotoAnteproyectos = objRemotoA;
-        this.objRemotoSeguimiento = objRemotoS;
+        GUIMenuDirector.refGestion = refGestion;
+        GUIMenuDirector.refSeguimiento = refSeguimiento;
+        GUIMenuDirector.refUsuarios = refUsuarios;
         this.idDirector = idDirector;
         this.nomCompleto = nomCompleto;
         jtxtANotificacion.setEditable(false);
@@ -306,20 +305,6 @@ public class GUIMenuDirector extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * Método que muestra un mensaje en el texto de area de notificación en la GUIMenuDirector
-     * @param mensaje
-     * @throws RemoteException 
-     */
-    public void mostarMensaje(String mensaje) throws RemoteException {
-        jcmbAntSinRemitir.removeAllItems();
-        ArrayList<Integer> NoRemitidos = objRemotoAnteproyectos.listaAntNoRemitidos(idDirector);
-        for (int i = 0; i < NoRemitidos.size(); i++) {
-            String codAnte = String.valueOf(NoRemitidos.get(i));
-            jcmbAntSinRemitir.addItem(codAnte);
-        }
-        jtxtANotificacion.append(mensaje);
-    }
     
     /**
      * Método que ajusta los parametros predeterminados del formulario.
@@ -351,7 +336,9 @@ public class GUIMenuDirector extends javax.swing.JFrame {
      */
     public void ListarCmbAnteproyectos() {
         try {
-            ArrayList<Integer> NoRemitidos = objRemotoAnteproyectos.listaAntNoRemitidos(idDirector);
+            int[] arrayNoRemitidos = refGestion.listaAntNoRemitidos(idDirector);
+            ArrayList<Integer> NoRemitidos = new ArrayList(Arrays.asList(arrayNoRemitidos));
+            
             if (NoRemitidos == null) {
                 JOptionPane.showMessageDialog(null, "No tiene anteproyectos sin remitir", "Advertencia", JOptionPane.WARNING_MESSAGE);
             } else {
@@ -360,7 +347,7 @@ public class GUIMenuDirector extends javax.swing.JFrame {
                     jcmbAntSinRemitir.addItem(codAnte);
                 }
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

@@ -246,7 +246,7 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
             }
         }
 
-        //call back para el director
+        //Registro en los anteproyectos no remitidos
         int validarFlujo = 0;
         int concepto1 = 0;
         int concepto2 = 0;

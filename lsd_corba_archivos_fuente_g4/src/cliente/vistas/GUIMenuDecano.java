@@ -20,9 +20,9 @@ import sop_corba.clsResolucionDTO;
 
 public class GUIMenuDecano extends javax.swing.JFrame {
     //Atributos
-    static GestionAnteproyectosIntOperations refGestion;
-    static GestionSeguimientoIntOperations refSeguimiento;
-    static GestionUsuariosIntOperations refUsuarios;
+    private static GestionAnteproyectosIntOperations refGestion;
+    private static GestionSeguimientoIntOperations refSeguimiento;
+    private static GestionUsuariosIntOperations refUsuarios;
 
     /**
      * Constructor vacio.
@@ -37,9 +37,9 @@ public class GUIMenuDecano extends javax.swing.JFrame {
      */
     public GUIMenuDecano(GestionAnteproyectosIntOperations refGestion, GestionSeguimientoIntOperations refSeguimiento, GestionUsuariosIntOperations refUsuarios) {
         initComponents();
-        GUIMenuAdministrador.refGestion = refGestion;
-        GUIMenuAdministrador.refSeguimiento = refSeguimiento;
-        GUIMenuAdministrador.refUsuarios = refUsuarios;
+        GUIMenuDecano.refGestion = refGestion;
+        GUIMenuDecano.refSeguimiento = refSeguimiento;
+        GUIMenuDecano.refUsuarios = refUsuarios;
         listarAntSinResolucion();
         llenaCmbAnteproyectos();
     }
