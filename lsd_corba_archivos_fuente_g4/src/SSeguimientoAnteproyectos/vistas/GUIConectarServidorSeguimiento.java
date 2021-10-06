@@ -124,7 +124,7 @@ public class GUIConectarServidorSeguimiento extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private static void inicializarORB(String[] vec, GestionSeguimientoImpl objRemoto) throws ServantNotActive, WrongPolicy, org.omg.CORBA.ORBPackage.InvalidName, AdapterInactive, InvalidName, NotFound, CannotProceed {
+    private void inicializarORB(String[] vec, GestionSeguimientoImpl objRemoto) throws ServantNotActive, WrongPolicy, org.omg.CORBA.ORBPackage.InvalidName, AdapterInactive, InvalidName, NotFound, CannotProceed {
         // crea e inicia el ORB
         ORB orb = ORB.init(vec, null);
         POA rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
@@ -141,16 +141,11 @@ public class GUIConectarServidorSeguimiento extends javax.swing.JFrame {
         // * se realiza el binding de la referencia del servant en el N_S *
         String name = "objSeguimiento";
         NameComponent path[] = ncref.to_name(name);
-        ncref.rebind(path, href);
+        ncref.rebind(path, href);      
 
-        System.out.println("El Servidor esta listo y esperando ...");
-        
-        GUIInfoServidor2 info2 = new GUIInfoServidor2();
-        info2.setVisible(true);
-        info2.setLocationRelativeTo(null);
         String mensaje = "Objeto remoto inicializado, El Servidor esta listo y esperando ...";
-        info2.jtxtAMensaje2.setText(mensaje);
-        info2.dispose();
+        System.out.println(mensaje);
+        this.dispose();
         orb.run();
     }
     

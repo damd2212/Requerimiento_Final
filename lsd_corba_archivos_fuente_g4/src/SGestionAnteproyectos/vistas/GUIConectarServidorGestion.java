@@ -138,45 +138,34 @@ public class GUIConectarServidorGestion extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    
-        /**
-         * Evento utilizado para conectar el servidor de gestion de
-         * anteproyectos
-         *
-         * @param evt
-         */
+    /**
+     * Evento utilizado para conectar el servidor de gestion de anteproyectos
+     *
+     * @param evt
+     */
     private void btnConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarActionPerformed
         // TODO add your handling code here:
-        String mensajeRegistroOR;
-        String mensajeRecuperarRefUsuario;
-        String mensajeRecuperarRef;
-        String mensajeRegistroORUsuario;
-        
-        try{
-        String[] vec = new String[4];
-        vec[0] = "-ORBInitialHost";
-        System.out.println("Ingrese la dirección IP donde escucha el n_s");
-        vec[1] = jtxtFDirIp.getText();
-        vec[2] = "-ORBInitialPort";
-        vec[3] = jtxtFPuerto.getText();
-        GestionAnteproyectosImpl objRemoto = new GestionAnteproyectosImpl();
-        GestionUsuariosImpl objRemoto2 = new GestionUsuariosImpl();
-        GestionSeguimientoInt ref = obtenerReferenciaSSeguimiento(vec);
-        objRemoto.almacenarReferenciaRemota(ref);
-        inicializarORB(vec,objRemoto2,objRemoto);
-    } 
-	
-	catch (Exception e) {
-		System.out.println("Error: " + e);
-		e.printStackTrace(System.out);
-	}
+        try {
+            String[] vec = new String[4];
+            vec[0] = "-ORBInitialHost";
+            vec[1] = jtxtFDirIp.getText();
+            vec[2] = "-ORBInitialPort";
+            vec[3] = jtxtFPuerto.getText();
+            GestionAnteproyectosImpl objRemoto = new GestionAnteproyectosImpl();
+            GestionUsuariosImpl objRemoto2 = new GestionUsuariosImpl();
+            GestionSeguimientoInt ref = obtenerReferenciaSSeguimiento(vec);
+            objRemoto.almacenarReferenciaRemota(ref);
+            inicializarORB(vec, objRemoto2, objRemoto);
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+            e.printStackTrace(System.out);
+        }
 
-	System.out.println("Servidor: Saliendo ...");
+        System.out.println("Servidor: Saliendo ...");
 
     }//GEN-LAST:event_btnConectarActionPerformed
 
-    
-    private void inicializarORB(String[] vec,GestionUsuariosImpl objRemoto2 , GestionAnteproyectosImpl objRemoto) throws ServantNotActive, WrongPolicy, org.omg.CORBA.ORBPackage.InvalidName, AdapterInactive, InvalidName, NotFound, CannotProceed {
+    private void inicializarORB(String[] vec, GestionUsuariosImpl objRemoto2, GestionAnteproyectosImpl objRemoto) throws ServantNotActive, WrongPolicy, org.omg.CORBA.ORBPackage.InvalidName, AdapterInactive, InvalidName, NotFound, CannotProceed {
         // crea e inicia el ORB
         ORB orb = ORB.init(vec, null);
         POA rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
@@ -185,7 +174,7 @@ public class GUIConectarServidorGestion extends javax.swing.JFrame {
         //*** se genera la referencia del servant
         org.omg.CORBA.Object obj = rootpoa.servant_to_reference(objRemoto);
         org.omg.CORBA.Object obj2 = rootpoa.servant_to_reference(objRemoto2);
-        
+
         GestionAnteproyectosInt href = GestionAnteproyectosIntHelper.narrow(obj);
         GestionUsuariosInt ref2 = GestionUsuariosIntHelper.narrow(obj2);
 
@@ -204,6 +193,7 @@ public class GUIConectarServidorGestion extends javax.swing.JFrame {
         System.out.println("El Servidor esta listo y esperando ...");
 
         // esperan por las invocaciones desde los clientes
+        this.dispose();
         orb.run();
     }
 
@@ -213,7 +203,7 @@ public class GUIConectarServidorGestion extends javax.swing.JFrame {
             ORB orb = ORB.init(vec, null);
             org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
             NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
-            String name = "objAdmin";
+            String name = "objSeguimiento";
             ref = (GestionSeguimientoInt) GestionSeguimientoIntHelper.narrow(ncRef.resolve_str(name));
         } catch (NotFound ex) {
             Logger.getLogger(SSeguimientoAnteproyectos.ServidorDeObjetosSeguimiento.class.getName()).log(Level.SEVERE, null, ex);
@@ -224,8 +214,7 @@ public class GUIConectarServidorGestion extends javax.swing.JFrame {
         }
         return ref;
     }
-    
-    
+
     /**
      * @param args the command line arguments
      */
