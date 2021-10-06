@@ -3,10 +3,12 @@
  */
 package cliente.vistas;
 
+import java.awt.HeadlessException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 import sop_corba.GestionAnteproyectosIntOperations;
 import sop_corba.GestionSeguimientoIntOperations;
 import sop_corba.GestionUsuariosIntOperations;
@@ -38,7 +40,6 @@ public class GUIMenuDirector extends javax.swing.JFrame {
         GUIMenuDirector.refUsuarios = refUsuarios;
         this.idDirector = idDirector;
         this.nomCompleto = nomCompleto;
-        jtxtANotificacion.setEditable(false);
         jcmbProgramas.setEnabled(false);
         jtxtFTitulo.setEnabled(false);
         jtxtFEst1.setEnabled(false);
@@ -97,14 +98,14 @@ public class GUIMenuDirector extends javax.swing.JFrame {
         btnSolicitar = new javax.swing.JButton();
         jlbImgRegistrarA = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jtxtANotificacion = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jlbSalirNotificacion = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jcmbAntSinRemitir = new javax.swing.JComboBox<>();
         btnRemitir = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tablaNoRemitidos = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Menu del Director");
@@ -112,6 +113,12 @@ public class GUIMenuDirector extends javax.swing.JFrame {
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
+            }
+        });
+
+        jTabbedPane1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTabbedPane1MouseClicked(evt);
             }
         });
 
@@ -241,13 +248,6 @@ public class GUIMenuDirector extends javax.swing.JFrame {
         jPanel2.setBackground(new java.awt.Color(20, 176, 191));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jtxtANotificacion.setColumns(20);
-        jtxtANotificacion.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jtxtANotificacion.setRows(5);
-        jScrollPane2.setViewportView(jtxtANotificacion);
-
-        jPanel2.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 460, 320));
-
         jLabel2.setFont(new java.awt.Font("Franklin Gothic Demi", 0, 26)); // NOI18N
         jLabel2.setText("Notificaciones Aprobados");
         jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(88, 11, -1, -1));
@@ -291,6 +291,21 @@ public class GUIMenuDirector extends javax.swing.JFrame {
             }
         });
         jPanel2.add(btnRemitir, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 430, -1, -1));
+
+        tablaNoRemitidos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null},
+                {null},
+                {null},
+                {null}
+            },
+            new String [] {
+                "Codigo anteproyecto"
+            }
+        ));
+        jScrollPane3.setViewportView(tablaNoRemitidos);
+
+        jPanel2.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, 440, 240));
 
         jTabbedPane1.addTab("Notificacion Anteproyectos Aprobados", jPanel2);
 
@@ -534,6 +549,7 @@ public class GUIMenuDirector extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "Anteproyecto remitido correctamente");
                     jcmbAntSinRemitir.removeAllItems();
                     ListarCmbAnteproyectos();
+                    llenarTabla();
                 } else {
                     JOptionPane.showMessageDialog(null, "Error al remitir el anteproyecto", "Error al remitir", JOptionPane.ERROR_MESSAGE);
                 }
@@ -561,6 +577,35 @@ public class GUIMenuDirector extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_formWindowClosing
 
+    private void jTabbedPane1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTabbedPane1MouseClicked
+        ListarCmbAnteproyectos();
+        llenarTabla();
+    }//GEN-LAST:event_jTabbedPane1MouseClicked
+
+    private void llenarTabla() {
+        try {
+            int[] antSinRemitir = refGestion.listaAntNoRemitidos(idDirector);
+            DefaultTableModel modelo = new DefaultTableModel();
+            if (antSinRemitir.length == 0) {
+                JOptionPane.showMessageDialog(null, "No tiene anteproyectos sin remitir", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                modelo.addColumn("Codigo Anteproyecto");
+                Object[] obj = new Object[]{""};
+                modelo.addRow(obj);
+                tablaNoRemitidos.setModel(modelo);
+            } else {
+                modelo.addColumn("Codigo Anteproyecto");
+                tablaNoRemitidos.setEnabled(false);
+                for (int i = 0; i < antSinRemitir.length; i++) {
+                    Object[] obj = new Object[]{antSinRemitir[i]};
+                    modelo.addRow(obj);
+                }
+                tablaNoRemitidos.setModel(modelo);
+            }
+        } catch (HeadlessException e) {
+            JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -608,7 +653,7 @@ public class GUIMenuDirector extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JComboBox<String> jcmbAntSinRemitir;
     private javax.swing.JComboBox<String> jcmbProgramas;
@@ -626,7 +671,6 @@ public class GUIMenuDirector extends javax.swing.JFrame {
     private javax.swing.JLabel jlbSalirNotificacion;
     private javax.swing.JLabel jlbTitulo;
     private javax.swing.JLabel jnlDirector;
-    private javax.swing.JTextArea jtxtANotificacion;
     private javax.swing.JTextArea jtxtAObjetivos;
     private javax.swing.JTextField jtxtFCodEst1;
     private javax.swing.JTextField jtxtFCodEst2;
@@ -635,5 +679,8 @@ public class GUIMenuDirector extends javax.swing.JFrame {
     private javax.swing.JTextField jtxtFEst1;
     private javax.swing.JTextField jtxtFEst2;
     private javax.swing.JTextField jtxtFTitulo;
+    private javax.swing.JTable tablaNoRemitidos;
     // End of variables declaration//GEN-END:variables
+
+    
 }
