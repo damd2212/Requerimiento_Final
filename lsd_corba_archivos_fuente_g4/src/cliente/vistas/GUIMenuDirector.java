@@ -12,6 +12,7 @@ import sop_corba.GestionSeguimientoIntOperations;
 import sop_corba.GestionUsuariosIntOperations;
 
 public class GUIMenuDirector extends javax.swing.JFrame {
+
     //Atributos
     private static GestionAnteproyectosIntOperations refGestion;
     private static GestionSeguimientoIntOperations refSeguimiento;
@@ -22,6 +23,7 @@ public class GUIMenuDirector extends javax.swing.JFrame {
 
     /**
      * Constructor Parametrizado.
+     *
      * @param refGestion
      * @param refSeguimiento
      * @param refUsuarios
@@ -49,7 +51,7 @@ public class GUIMenuDirector extends javax.swing.JFrame {
         ListarCmbAnteproyectos();
         jtxtFDirector.setText(nomCompleto);
     }
-    
+
     /**
      * Constructor vacio.
      */
@@ -305,7 +307,6 @@ public class GUIMenuDirector extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    
     /**
      * Método que ajusta los parametros predeterminados del formulario.
      */
@@ -336,16 +337,17 @@ public class GUIMenuDirector extends javax.swing.JFrame {
      */
     public void ListarCmbAnteproyectos() {
         try {
+
             int[] arrayNoRemitidos = refGestion.listaAntNoRemitidos(idDirector);
-            ArrayList<Integer> NoRemitidos = new ArrayList(Arrays.asList(arrayNoRemitidos));
-            
-            if (NoRemitidos == null) {
+
+            if (arrayNoRemitidos.length == 0) {
                 JOptionPane.showMessageDialog(null, "No tiene anteproyectos sin remitir", "Advertencia", JOptionPane.WARNING_MESSAGE);
             } else {
-                for (int i = 0; i < NoRemitidos.size(); i++) {
-                    String codAnte = String.valueOf(NoRemitidos.get(i));
+                
+                for (int i = 0; i < arrayNoRemitidos.length; i++) {
+                    String codAnte = String.valueOf(arrayNoRemitidos[i]);
                     jcmbAntSinRemitir.addItem(codAnte);
-                }
+                } 
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -353,8 +355,9 @@ public class GUIMenuDirector extends javax.swing.JFrame {
     }
 
     /**
-     * Método que captura el evento del botón registrar al efectuar un click, y posteriormente
-     * registra el formato A.
+     * Método que captura el evento del botón registrar al efectuar un click, y
+     * posteriormente registra el formato A.
+     *
      * @param evt evento.
      */
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
@@ -428,8 +431,9 @@ public class GUIMenuDirector extends javax.swing.JFrame {
     }
 
     /**
-     * Método que captura el evento del mouse o ratón al efectuar un click en el botón salir y posteriormente
-     * cierra sesión.
+     * Método que captura el evento del mouse o ratón al efectuar un click en el
+     * botón salir y posteriormente cierra sesión.
+     *
      * @param evt evento.
      */
     private void jlbBSalirMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlbBSalirMouseClicked
@@ -445,8 +449,10 @@ public class GUIMenuDirector extends javax.swing.JFrame {
     }//GEN-LAST:event_jlbBSalirMouseClicked
 
     /**
-     * Método que solicita un código unico para el formato A, y ajusta los campos de registro.
-     * @param evt 
+     * Método que solicita un código unico para el formato A, y ajusta los
+     * campos de registro.
+     *
+     * @param evt
      */
     private void btnSolicitarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolicitarActionPerformed
         try {
@@ -468,9 +474,10 @@ public class GUIMenuDirector extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSolicitarActionPerformed
 
     /**
-     * Este método se ejecuta cuando el usuario presiona una tecla para ingresar el codigo del
-     * estudiante, restringiendolo unicamente a números.
-     * @param evt 
+     * Este método se ejecuta cuando el usuario presiona una tecla para ingresar
+     * el codigo del estudiante, restringiendolo unicamente a números.
+     *
+     * @param evt
      */
     private void jtxtFCodEst1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtxtFCodEst1KeyTyped
         char c = evt.getKeyChar();
@@ -480,9 +487,10 @@ public class GUIMenuDirector extends javax.swing.JFrame {
     }//GEN-LAST:event_jtxtFCodEst1KeyTyped
 
     /**
-     * Este método se ejecuta cuando el usuario presiona una tecla para ingresar el codigo del
-     * estudiante, restringiendolo unicamente a números.
-     * @param evt 
+     * Este método se ejecuta cuando el usuario presiona una tecla para ingresar
+     * el codigo del estudiante, restringiendolo unicamente a números.
+     *
+     * @param evt
      */
     private void jtxtFCodEst2KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtxtFCodEst2KeyTyped
         char c = evt.getKeyChar();
@@ -492,8 +500,9 @@ public class GUIMenuDirector extends javax.swing.JFrame {
     }//GEN-LAST:event_jtxtFCodEst2KeyTyped
 
     /**
-     * Método que captura el evento del mouse o ratón al efectuar un click en el botón salir y posteriormente
-     * cierra sesión.
+     * Método que captura el evento del mouse o ratón al efectuar un click en el
+     * botón salir y posteriormente cierra sesión.
+     *
      * @param evt evento.
      */
     private void jlbSalirNotificacionMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlbSalirNotificacionMouseClicked
@@ -509,7 +518,9 @@ public class GUIMenuDirector extends javax.swing.JFrame {
     }//GEN-LAST:event_jlbSalirNotificacionMouseClicked
 
     /**
-     * Método que captura el evento de remitir un anteproyecto por parte del director.
+     * Método que captura el evento de remitir un anteproyecto por parte del
+     * director.
+     *
      * @param evt evento.
      */
     private void btnRemitirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemitirActionPerformed
@@ -533,9 +544,10 @@ public class GUIMenuDirector extends javax.swing.JFrame {
     }//GEN-LAST:event_btnRemitirActionPerformed
 
     /**
-     * Método que se activa cuando se cierra la ventana en el icono rojo de la parte posterior derecha,
-     * cierra y destruye la sesión.
-     * @param evt 
+     * Método que se activa cuando se cierra la ventana en el icono rojo de la
+     * parte posterior derecha, cierra y destruye la sesión.
+     *
+     * @param evt
      */
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         try {
