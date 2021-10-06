@@ -25,16 +25,16 @@ public class GUIMenuEvaluador extends javax.swing.JFrame {
     
     /**
      * Constructor Parametrizado
-     * @param objRemoto objeto remoto de usuario
-     * @param objRemotoA objeto remoto de anteproyecto
-     * @param objRemotoS objeto remoto de seguimiento
+     * @param refGestion
+     * @param refSeguimiento
+     * @param refUsuarios
      * @param idEvaluador identificación del evaluador
      */
-    public GUIMenuEvaluador(GestionUsuariosIntOperations objRemoto, GestionAnteproyectosIntOperations objRemotoA, GestionSeguimientoIntOperations objRemotoS, int idEvaluador) {
+    public GUIMenuEvaluador(GestionAnteproyectosIntOperations refGestion, GestionSeguimientoIntOperations refSeguimiento, GestionUsuariosIntOperations refUsuarios, int idEvaluador) {
         initComponents();
-        GUIMenuEvaluador.objRemotoUsuarios = objRemoto;
-        GUIMenuEvaluador.objRemotoAnteproyectos = objRemotoA;
-        GUIMenuEvaluador.objRemotoSeguimiento = objRemotoS;
+        GUIMenuEvaluador.objRemotoUsuarios = refUsuarios;
+        GUIMenuEvaluador.objRemotoAnteproyectos = refGestion;
+        GUIMenuEvaluador.objRemotoSeguimiento = refSeguimiento;
         this.idEvaluador = idEvaluador;
         String fecha = fechaActual();
         jlbFechaActual.setText(fecha);

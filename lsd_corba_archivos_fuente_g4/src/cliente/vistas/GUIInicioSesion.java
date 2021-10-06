@@ -149,8 +149,7 @@ public class GUIInicioSesion extends javax.swing.JFrame {
                         case "Director":
                             int idDirector = objUsuario.identificacion;
                             refUsuarios.IniSesion(idDirector);
-                            ArrayList<Integer> codAnteproyecto = new ArrayList();
-                            GUIMenuDirector menuDirector = new GUIMenuDirector(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento, idDirector,nomUsuario);
+                            GUIMenuDirector menuDirector = new GUIMenuDirector(refGestion,refSeguimiento,refUsuarios, idDirector,nomUsuario);
                             menuDirector.setVisible(true);
                             menuDirector.setLocationRelativeTo(null);
                             this.dispose();
@@ -158,21 +157,21 @@ public class GUIInicioSesion extends javax.swing.JFrame {
 
                         case "Evaluador":
                             int idEvaluador = objUsuario.identificacion;
-                            GUIMenuEvaluador menuEvaluador = new GUIMenuEvaluador(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento, idEvaluador);
+                            GUIMenuEvaluador menuEvaluador = new GUIMenuEvaluador(refGestion,refSeguimiento,refUsuarios, idEvaluador);
                             menuEvaluador.setVisible(true);
                             menuEvaluador.setLocationRelativeTo(null);
                             this.dispose();
                             break;
 
                         case "Jefe Departamento":
-                            GUIMenuJefeDepartamento menuJDepartamento = new GUIMenuJefeDepartamento(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+                            GUIMenuJefeDepartamento menuJDepartamento = new GUIMenuJefeDepartamento(refGestion,refSeguimiento,refUsuarios);
                             menuJDepartamento.setVisible(true);
                             menuJDepartamento.setLocationRelativeTo(null);
                             this.dispose();
                             break;
 
                         case "Coordinador":
-                            GUIMenuCoordinador menuCoordinador = new GUIMenuCoordinador(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+                            GUIMenuCoordinador menuCoordinador = new GUIMenuCoordinador(refGestion,refSeguimiento,refUsuarios);
                             menuCoordinador.setVisible(true);
                             menuCoordinador.setLocationRelativeTo(null);
                             this.dispose();

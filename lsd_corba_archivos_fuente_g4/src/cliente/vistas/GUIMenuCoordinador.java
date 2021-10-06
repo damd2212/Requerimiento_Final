@@ -23,11 +23,11 @@ public class GUIMenuCoordinador extends javax.swing.JFrame {
     private static GestionSeguimientoIntOperations refSeguimiento;
     private static GestionUsuariosIntOperations refUsuarios;
 
-    public GUIMenuCoordinador(GestionUsuariosIntOperations objRemotoU, GestionAnteproyectosIntOperations objRemotoA, GestionSeguimientoIntOperations objRemotoS) {
+    public GUIMenuCoordinador(GestionAnteproyectosIntOperations refGestion, GestionSeguimientoIntOperations refSeguimiento, GestionUsuariosIntOperations refUsuarios) {
         initComponents();
-        GUIMenuCoordinador.refUsuarios = objRemotoU;
-        GUIMenuCoordinador.refGestion = objRemotoA;
-        GUIMenuCoordinador.refSeguimiento = objRemotoS;
+        GUIMenuCoordinador.refUsuarios = refUsuarios;
+        GUIMenuCoordinador.refGestion = refGestion;
+        GUIMenuCoordinador.refSeguimiento = refSeguimiento;
         listarEvaluadores();
         listarAntFormatoC();
         listarNoAsignados();

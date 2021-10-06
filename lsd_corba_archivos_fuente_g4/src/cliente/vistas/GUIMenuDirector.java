@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import sop_corba.GestionAnteproyectosIntOperations;
 import sop_corba.GestionSeguimientoIntOperations;
 import sop_corba.GestionUsuariosIntOperations;
+import sop_corba.clsFormatoADTO;
 
 public class GUIMenuDirector extends javax.swing.JFrame {
 
@@ -297,11 +298,11 @@ public class GUIMenuDirector extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 579, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 579, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -417,15 +418,14 @@ public class GUIMenuDirector extends javax.swing.JFrame {
             String coDirector = jtxtFCodirector.getText();
             String objetivos = jtxtAObjetivos.getText();
             clsFormatoADTO formatoA = new clsFormatoADTO(codigo, programa, titulo, estudiante1, codEst1, estudiante2, codEst2, director, coDirector, objetivos, idDirector, 1);
-            boolean registrar = objRemotoAnteproyectos.RegistrarFormatoA(formatoA);
+            boolean registrar = refGestion.registrarFormatoA(formatoA);
             if (registrar == true) {
-                objRemotoAnteproyectos.registrarAnteproyectoEnCallback(idDirector, codigo);
                 JOptionPane.showMessageDialog(null, "Formato A registrado exitosamente");
                 limpiar();
             } else {
                 JOptionPane.showMessageDialog(null, "No se pudo registrar el Foramto A", "Error en el registro", JOptionPane.ERROR_MESSAGE);
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -438,12 +438,12 @@ public class GUIMenuDirector extends javax.swing.JFrame {
      */
     private void jlbBSalirMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlbBSalirMouseClicked
         try {
-            objRemotoUsuarios.CerrarSesion(idDirector);
-            GUIInicioSesion ini = new GUIInicioSesion(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+            refUsuarios.CerrarSesion(idDirector);
+            GUIInicioSesion ini = new GUIInicioSesion(refGestion,refSeguimiento,refUsuarios);
             ini.setVisible(true);
             ini.setLocationRelativeTo(null);
             this.dispose();
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jlbBSalirMouseClicked
@@ -456,7 +456,7 @@ public class GUIMenuDirector extends javax.swing.JFrame {
      */
     private void btnSolicitarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSolicitarActionPerformed
         try {
-            codigo = this.objRemotoAnteproyectos.SolicitarCodigo();
+            codigo = GUIMenuDirector.refGestion.SolicitarCodigo();
             jlbCodReg.setText(Integer.toString(codigo));
             btnSolicitar.setEnabled(false);
             jcmbProgramas.setEnabled(true);
@@ -468,7 +468,7 @@ public class GUIMenuDirector extends javax.swing.JFrame {
             jtxtFCodirector.setEnabled(true);
             jtxtAObjetivos.setEnabled(true);
             btnRegistrar.setEnabled(true);
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnSolicitarActionPerformed
@@ -507,12 +507,12 @@ public class GUIMenuDirector extends javax.swing.JFrame {
      */
     private void jlbSalirNotificacionMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlbSalirNotificacionMouseClicked
         try {
-            objRemotoUsuarios.CerrarSesion(idDirector);
-            GUIInicioSesion ini = new GUIInicioSesion(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+            refUsuarios.CerrarSesion(idDirector);
+            GUIInicioSesion ini = new GUIInicioSesion(refGestion,refSeguimiento,refUsuarios);
             ini.setVisible(true);
             ini.setLocationRelativeTo(null);
             this.dispose();
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jlbSalirNotificacionMouseClicked
@@ -529,7 +529,7 @@ public class GUIMenuDirector extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Este campo no puede estar vacio", "Advertencia", JOptionPane.WARNING_MESSAGE);
             } else {
                 int codigoAnt = Integer.parseInt(jcmbAntSinRemitir.getSelectedItem().toString());
-                boolean remitido = objRemotoAnteproyectos.remitirAnteproyecto(codigoAnt);
+                boolean remitido = refGestion.remitirAnteproyecto(codigoAnt);
                 if (remitido) {
                     JOptionPane.showMessageDialog(null, "Anteproyecto remitido correctamente");
                     jcmbAntSinRemitir.removeAllItems();
@@ -538,7 +538,7 @@ public class GUIMenuDirector extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "Error al remitir el anteproyecto", "Error al remitir", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnRemitirActionPerformed
@@ -551,12 +551,12 @@ public class GUIMenuDirector extends javax.swing.JFrame {
      */
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         try {
-            objRemotoUsuarios.CerrarSesion(idDirector);
-            GUIInicioSesion ini = new GUIInicioSesion(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+            refUsuarios.CerrarSesion(idDirector);
+            GUIInicioSesion ini = new GUIInicioSesion(refGestion,refSeguimiento,refUsuarios);
             ini.setVisible(true);
             ini.setLocationRelativeTo(null);
             this.dispose();
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_formWindowClosing

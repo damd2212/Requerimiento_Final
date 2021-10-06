@@ -3,33 +3,34 @@
  */
 package cliente.vistas;
 
-import SGestionAnteproyectos.sop_rmi.GestionAnteproyectosInt;
-import SGestionAnteproyectos.sop_rmi.GestionUsuariosInt;
-import SGestionAnteproyectos.dto.clsFormatoCDTO;
-import SGestionAnteproyectos.dto.clsConceptosDTO;
-import SGestionAnteproyectos.dto.clsFormatoBDTO;
-import SSeguimientoAnteproyectos.sop_rmi.GestionSeguimientoInt;
-
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import sop_corba.GestionAnteproyectosIntOperations;
+import sop_corba.GestionSeguimientoIntOperations;
+import sop_corba.GestionUsuariosIntOperations;
+import sop_corba.clsConceptosDTO;
+import sop_corba.clsFormatoCDTO;
 
 public class GUIMenuJefeDepartamento extends javax.swing.JFrame {
 
     // Atributos 
-    private static GestionAnteproyectosInt objRemotoAnteproyectos;
-    private static GestionUsuariosInt objRemotoUsuarios;
-    private static GestionSeguimientoInt objRemotoSeguimiento;
+    private static GestionAnteproyectosIntOperations refGestion;
+    private static GestionSeguimientoIntOperations refSeguimiento;
+    private static GestionUsuariosIntOperations refUsuarios;
 
     /**
      * Constructor parametrizado.
+     * @param refGestion
+     * @param refSeguimiento
+     * @param refUsuarios
      */
-    public GUIMenuJefeDepartamento(GestionUsuariosInt objRemoto, GestionAnteproyectosInt objRemotoA, GestionSeguimientoInt objRemotoS) {
+    public GUIMenuJefeDepartamento(GestionAnteproyectosIntOperations refGestion, GestionSeguimientoIntOperations refSeguimiento, GestionUsuariosIntOperations refUsuarios) {
         initComponents();
-        this.objRemotoUsuarios = objRemoto;
-        this.objRemotoAnteproyectos = objRemotoA;
-        this.objRemotoSeguimiento = objRemotoS;
+        GUIMenuJefeDepartamento.refGestion = refGestion;
+        GUIMenuJefeDepartamento.refSeguimiento = refSeguimiento;
+        GUIMenuJefeDepartamento.refUsuarios = refUsuarios;
 
         listarAnteproyectosDisponibles();
         listarCmbAnteproyectos();
@@ -56,12 +57,13 @@ public class GUIMenuJefeDepartamento extends javax.swing.JFrame {
      */
     public void listarCmbAnteproyectos() {
         try {
-            ArrayList<Integer> formatos = objRemotoAnteproyectos.listaAntRemitidos();
-            for (int i = 0; i < formatos.size(); i++) {
-                String codAnte = String.valueOf(formatos.get(i));
+            
+            int[] formatos = refGestion.listaAntRemitidos();
+            for (int i = 0; i < formatos.length; i++) {
+                String codAnte = String.valueOf(formatos[i]);
                 jcmbAnteproyectos.addItem(codAnte);
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -72,9 +74,9 @@ public class GUIMenuJefeDepartamento extends javax.swing.JFrame {
      */
     public void listarAnteproyectosDisponibles() {
         try {
-            ArrayList<Integer> formatos = objRemotoAnteproyectos.listaAntRemitidos();
+            int[] formatos = refGestion.listaAntRemitidos();
             DefaultTableModel modelo = new DefaultTableModel();
-            if (formatos.isEmpty()) {
+            if (formatos.length == 0) {
                 JOptionPane.showMessageDialog(null, "No tiene anteproyectos asignados o remitidos", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 modelo.addColumn("Codigo Anteproyecto");
                 Object[] obj = new Object[]{""};
@@ -83,15 +85,15 @@ public class GUIMenuJefeDepartamento extends javax.swing.JFrame {
             } else {
                 modelo.addColumn("Codigo Anteproyecto");
                 tablaDisponibles.setEnabled(false);
-                for (int i = 0; i < formatos.size(); i++) {
-                    int formato = formatos.get(i);
+                for (int i = 0; i < formatos.length; i++) {
+                    int formato = formatos[i];
                     Object[] obj = new Object[]{formato};
                     modelo.addRow(obj);
                 }
                 tablaDisponibles.setModel(modelo);
             }
 
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -255,7 +257,7 @@ public class GUIMenuJefeDepartamento extends javax.swing.JFrame {
      * @param evt evento.
      */
     private void jlbBSalirMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlbBSalirMouseClicked
-        GUIInicioSesion ini = new GUIInicioSesion(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
+        GUIInicioSesion ini = new GUIInicioSesion(refGestion,refSeguimiento,refUsuarios);
         ini.setVisible(true);
         ini.setLocationRelativeTo(null);
         this.dispose();
@@ -271,7 +273,7 @@ public class GUIMenuJefeDepartamento extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Este campo para el codigo no puede estar vacio", "Advertencia", JOptionPane.WARNING_MESSAGE);
             } else {
                 int codigo = Integer.parseInt(jcmbAnteproyectos.getSelectedItem().toString());
-                int flujo = objRemotoAnteproyectos.VerificarAnteproyecto(codigo);
+                int flujo = refGestion.VerificarAnteproyecto(codigo);
                 if (flujo == 0) {
                     JOptionPane.showMessageDialog(null, "Anteproyecto ingresado no encontrado", "Error en la busqueda", JOptionPane.ERROR_MESSAGE);
                 } else if (flujo < 3) {
@@ -279,13 +281,13 @@ public class GUIMenuJefeDepartamento extends javax.swing.JFrame {
                 } else if (flujo >= 4) {
                     JOptionPane.showMessageDialog(null, "El anteproyecto ya fue evaluado", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    clsConceptosDTO conceptos = objRemotoAnteproyectos.consultarConceptos(codigo);
-                    if (conceptos.getConcepto1().equals("Aprobado") && conceptos.getConcepto2().equals("Aprobado")) {
+                    clsConceptosDTO conceptos = refGestion.consultarConceptos(codigo);
+                    if (conceptos.Concepto1.equals("Aprobado") && conceptos.Concepto2.equals("Aprobado")) {
                         String concepto = (String) jcmbConcepto.getSelectedItem();
                         String estructura = (String) jcmbEstructura.getSelectedItem();
                         String observaciones = jtxtFObservaciones.getText();
                         clsFormatoCDTO formatoC = new clsFormatoCDTO(codigo, estructura, concepto, observaciones);
-                        boolean registrarC = objRemotoAnteproyectos.RegistrarFormatoC(formatoC);
+                        boolean registrarC = refGestion.RegistrarFormatoC(formatoC);
                         if (registrarC == true) {
                             JOptionPane.showMessageDialog(null, "Anteproyecto registrado exitosamente en el formato C");
                             listarAnteproyectosDisponibles();
@@ -299,7 +301,7 @@ public class GUIMenuJefeDepartamento extends javax.swing.JFrame {
                     }
                 }
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "La operacion no se pudo completar, intente nuevamente..." + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnRegistrarActionPerformed
