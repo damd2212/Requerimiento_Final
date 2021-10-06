@@ -1,9 +1,12 @@
 package cliente.vistas;
 
-import cliente.utilidades.UtilidadesRegistroC;
-import SGestionAnteproyectos.sop_rmi.GestionAnteproyectosInt;
-import SGestionAnteproyectos.sop_rmi.GestionUsuariosInt;
-import SSeguimientoAnteproyectos.sop_rmi.GestionSeguimientoInt;
+import org.omg.CORBA.ORB;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
+import sop_corba.GestionAnteproyectosIntOperations;
+import sop_corba.GestionSeguimientoIntOperations;
+import sop_corba.GestionUsuariosIntOperations;
+import sop_corba.*;
 import javax.swing.JOptionPane;
 
 /**
@@ -12,6 +15,10 @@ import javax.swing.JOptionPane;
  */
 public class GUIConectarCliente extends javax.swing.JFrame {
 
+    static GestionAnteproyectosIntOperations refGestion;
+    static GestionSeguimientoIntOperations refSeguimiento;
+    static GestionUsuariosIntOperations refUsuarios;
+    
     /**
      * Constructor sin parametrizar
      */
@@ -40,6 +47,7 @@ public class GUIConectarCliente extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Conectar Cliente");
         setResizable(false);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setPreferredSize(new java.awt.Dimension(318, 260));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -74,16 +82,7 @@ public class GUIConectarCliente extends javax.swing.JFrame {
         jlbImgConectarCliente.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/conectarCliente.png"))); // NOI18N
         jPanel1.add(jlbImgConectarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 240));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
-        );
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 289, 238));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -93,28 +92,37 @@ public class GUIConectarCliente extends javax.swing.JFrame {
      * @param evt 
      */
     private void btnConectarCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarCActionPerformed
-        GestionAnteproyectosInt objRemoto;
-        GestionUsuariosInt objRemotoUsuarios;
-        GestionSeguimientoInt objRemotoSeguimiento;
-        if (jtxtFPertoC.getText().equals("") || jtxtFDirIPC.getText().equals("")) {
-            JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        } else {
-            try {
-                int puerto = Integer.parseInt(jtxtFPertoC.getText());
-                objRemotoUsuarios = (GestionUsuariosInt) UtilidadesRegistroC.obtenerObjRemoto(jtxtFDirIPC.getText(), puerto, "objetoRemotoUsuario");
-                objRemoto = (GestionAnteproyectosInt) UtilidadesRegistroC.obtenerObjRemoto(jtxtFDirIPC.getText(), puerto, "objetoRemotoGestion");
-                objRemotoSeguimiento = (GestionSeguimientoInt) UtilidadesRegistroC.obtenerObjRemoto(jtxtFDirIPC.getText(), puerto, "objetoRemotoSeguimiento");
-                if (objRemotoUsuarios != null && objRemoto != null && objRemotoSeguimiento != null) {
-                    GUIInicioSesion iniciar = new GUIInicioSesion(objRemotoUsuarios, objRemoto, objRemotoSeguimiento);
-                    iniciar.setVisible(true);
-                    iniciar.setLocationRelativeTo(null);
-                    this.dispose();
-                } else {
-                    JOptionPane.showMessageDialog(null, "Direccion IP o puerto incorrecto.", "Error de validacion", JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "El puerto debe ser unicamente numerico.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            }
+        try{
+            String[] vec = new String[4];
+            vec[0] = "-ORBInitialPort";
+            vec[1] = jtxtFDirIPC.getText();
+            vec[2] = "-ORBInitialPort";
+            vec[3] = jtxtFPertoC.getText();
+
+            // se crea e inicia el ORB
+            ORB orb = ORB.init(vec, null);
+
+            // se obtiene un link al name service
+            org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+            NamingContextExt ncRef = NamingContextExtHelper.narrow(objRef);
+
+            // * Resuelve la referencia del objeto en el N_S *
+            String name = "objAnteproyectos";
+            String name2 = "objSeguimiento";
+            String name3 = "objUsuarios";
+            refGestion = GestionAnteproyectosIntHelper.narrow(ncRef.resolve_str(name));
+            refUsuarios = GestionUsuariosIntHelper.narrow(ncRef.resolve_str(name2));
+            refSeguimiento = GestionSeguimientoIntHelper.narrow(ncRef.resolve_str(name3));
+
+            System.out.println("Obtenido el manejador sobre el servidor de objetos: " + refGestion);
+            System.out.println("Obtenido el manejador sobre el servidor de objetos: " + refUsuarios);
+            System.out.println("Obtenido el manejador sobre el servidor de objetos: " + refSeguimiento);
+            
+            
+            
+        }catch(Exception e){
+            System.out.println("ERROR : " + e);
+            e.printStackTrace(System.out);
         }
     }//GEN-LAST:event_btnConectarCActionPerformed
 
