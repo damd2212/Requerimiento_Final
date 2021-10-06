@@ -1,14 +1,12 @@
 package cliente.vistas;
 
-import SGestionAnteproyectos.dto.RegistroDTO;
-import SGestionAnteproyectos.dto.clsUsuariosDTO;
-import SGestionAnteproyectos.sop_rmi.GestionAnteproyectosInt;
-import SGestionAnteproyectos.sop_rmi.GestionUsuariosInt;
-import SSeguimientoAnteproyectos.sop_rmi.GestionSeguimientoInt;
-import cliente.sop_rmi.NotificacionCllbckImpl;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import sop_corba.GestionAnteproyectosIntOperations;
+import sop_corba.GestionSeguimientoIntOperations;
+import sop_corba.GestionUsuariosIntOperations;
+import sop_corba.clsUsuariosDTO;
 
 /**
  *
@@ -19,18 +17,21 @@ public class GUIInicioSesion extends javax.swing.JFrame {
     /*
     Atributos
      */
-    private static GestionUsuariosInt objRemotoUsuarios;
-    private static GestionAnteproyectosInt objRemotoAnteproyectos;
-    private static GestionSeguimientoInt objRemotoSeguimiento;
+    static GestionAnteproyectosIntOperations refGestion;
+    static GestionSeguimientoIntOperations refSeguimiento;
+    static GestionUsuariosIntOperations refUsuarios;
 
     /**
      * Constructor parametrizado
+     * @param refGestion
+     * @param refSeguimiento
+     * @param refUsuarios
      */
-    public GUIInicioSesion(GestionUsuariosInt objRemotoU, GestionAnteproyectosInt objRemotoA, GestionSeguimientoInt objRemotoS) {
+    public GUIInicioSesion(GestionAnteproyectosIntOperations refGestion, GestionSeguimientoIntOperations refSeguimiento, GestionUsuariosIntOperations refUsuarios) {
         initComponents();
-        this.objRemotoUsuarios = objRemotoU;
-        this.objRemotoAnteproyectos = objRemotoA;
-        this.objRemotoSeguimiento = objRemotoS;
+        GUIInicioSesion.refGestion = refGestion;
+        GUIInicioSesion.refSeguimiento = refSeguimiento;
+        GUIInicioSesion.refUsuarios = refUsuarios;
     }
 
     /**
@@ -60,6 +61,7 @@ public class GUIInicioSesion extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Inicio Sesion");
         setResizable(false);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setPreferredSize(new java.awt.Dimension(321, 268));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -97,16 +99,7 @@ public class GUIInicioSesion extends javax.swing.JFrame {
         jlbImgInicioSesion.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/iniciar sesion.png"))); // NOI18N
         jPanel1.add(jlbImgInicioSesion, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 290, 250));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
-        );
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 292, 250));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -121,8 +114,6 @@ public class GUIInicioSesion extends javax.swing.JFrame {
         String usuario = "admin";
         String clave = "admin123";
         if (jtxtFUsuario.getText().equals(usuario) && jpassClave.getText().equals(clave)) {
-            //GUIMenuAdmin mAdmin = new GUIMenuAdmin(objRemotoUsuarios,objRemotoAnteproyectos);
-            //mAdmin.setVisible(true);
             GUIMenuAdministrador pru = new GUIMenuAdministrador(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento);
             pru.setVisible(true);
             pru.setLocationRelativeTo(null);
@@ -132,38 +123,33 @@ public class GUIInicioSesion extends javax.swing.JFrame {
                 String user = jtxtFUsuario.getText();
                 String pass = new String(jpassClave.getPassword());
                 clsUsuariosDTO objUsuario = null;
-                objUsuario = objRemotoUsuarios.IniciarSesion(user, pass);
+                objUsuario = refUsuarios.IniciarSesion(user, pass);
                 if (objUsuario == null) {
                     if (user.equals("") || pass.equals("")) {
                         JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios.", "Advertencia", JOptionPane.WARNING_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(null, "Credenciales Incorrectas.", "Error al validar credenciales", JOptionPane.ERROR_MESSAGE);
                     }
-                } else if (objUsuario.isSesion()) {
+                } else if (objUsuario.sesion) {
                     JOptionPane.showMessageDialog(null, "Ya existe una sesion abierta para este usuario", "Error al iniciar sesion", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    String rolUsuario = objUsuario.getRole();
-                    String nomUsuario = objUsuario.getNomCompleto();
+                    String rolUsuario = objUsuario.role;
+                    String nomUsuario = objUsuario.nomCompleto;
 
                     switch (rolUsuario) {
 
                         case "Director":
-                            int idDirector = objUsuario.getIdentificacion();
-                            objRemotoUsuarios.IniciarSesion(idDirector);
+                            int idDirector = objUsuario.identificacion;
+                            refUsuarios.IniSesion(idDirector);
                             ArrayList<Integer> codAnteproyecto = new ArrayList();
                             GUIMenuDirector menuDirector = new GUIMenuDirector(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento, idDirector,nomUsuario);
-                            NotificacionCllbckImpl objCllbck = new NotificacionCllbckImpl();
-                            objCllbck.enviarReferencia(menuDirector);
-                            RegistroDTO objRegistro = new RegistroDTO(codAnteproyecto, objUsuario.getIdentificacion(), objCllbck);
-                            objRemotoAnteproyectos.registrarCallback(objRegistro);
-                            System.out.println("Director registrado en el callback");
                             menuDirector.setVisible(true);
                             menuDirector.setLocationRelativeTo(null);
                             this.dispose();
                             break;
 
                         case "Evaluador":
-                            int idEvaluador = objUsuario.getIdentificacion();
+                            int idEvaluador = objUsuario.identificacion;
                             GUIMenuEvaluador menuEvaluador = new GUIMenuEvaluador(objRemotoUsuarios, objRemotoAnteproyectos, objRemotoSeguimiento, idEvaluador);
                             menuEvaluador.setVisible(true);
                             menuEvaluador.setLocationRelativeTo(null);

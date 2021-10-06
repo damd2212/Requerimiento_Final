@@ -111,12 +111,19 @@ public class GUIConectarCliente extends javax.swing.JFrame {
             String name2 = "objSeguimiento";
             String name3 = "objUsuarios";
             refGestion = GestionAnteproyectosIntHelper.narrow(ncRef.resolve_str(name));
-            refUsuarios = GestionUsuariosIntHelper.narrow(ncRef.resolve_str(name3));
             refSeguimiento = GestionSeguimientoIntHelper.narrow(ncRef.resolve_str(name2));
+            refUsuarios = GestionUsuariosIntHelper.narrow(ncRef.resolve_str(name3));
+            
 
             System.out.println("Obtenido el manejador sobre el servidor de objetos: " + refGestion);
             System.out.println("Obtenido el manejador sobre el servidor de objetos: " + refUsuarios);
             System.out.println("Obtenido el manejador sobre el servidor de objetos: " + refSeguimiento);
+            
+            GUIInicioSesion iniciar = new GUIInicioSesion(refGestion, refSeguimiento, refUsuarios);
+            iniciar.setVisible(true);
+            iniciar.setLocationRelativeTo(null);
+            
+            this.dispose();
             
         }catch(Exception e){
             System.out.println("ERROR : " + e);
