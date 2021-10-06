@@ -578,7 +578,6 @@ public class GUIMenuDirector extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void jTabbedPane1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTabbedPane1MouseClicked
-        ListarCmbAnteproyectos();
         llenarTabla();
     }//GEN-LAST:event_jTabbedPane1MouseClicked
 
