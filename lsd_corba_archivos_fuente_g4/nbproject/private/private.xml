@@ -3,7 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Proyecto%20Distribuidos/Requerimiento%20Lab/Requerimiento_Final/lsd_corba_archivos_fuente_g4/src/cliente/vistas/GUIConectarCliente.java</file>
+            <file>file:/D:/Proyecto%20Distribuidos/Requerimiento%20Lab/Requerimiento_Final/lsd_corba_archivos_fuente_g4/src/cliente/vistas/GUIMenuEvaluador.java</file>
+            <file>file:/D:/Proyecto%20Distribuidos/Requerimiento%20Lab/Requerimiento_Final/lsd_corba_archivos_fuente_g4/src/cliente/vistas/GUIInicioSesion.java</file>
+            <file>file:/D:/Proyecto%20Distribuidos/Requerimiento%20Lab/Requerimiento_Final/lsd_corba_archivos_fuente_g4/src/SGestionAnteproyectos/GestionUsuariosImpl.java</file>
+            <file>file:/D:/Proyecto%20Distribuidos/Requerimiento%20Lab/Requerimiento_Final/lsd_corba_archivos_fuente_g4/src/cliente/vistas/GUIMenuAdministrador.java</file>
+            <file>file:/D:/Proyecto%20Distribuidos/Requerimiento%20Lab/Requerimiento_Final/lsd_corba_archivos_fuente_g4/src/cliente/vistas/GUIMenuDirector.java</file>
         </group>
     </open-files>
 </project-private>
