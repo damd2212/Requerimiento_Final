@@ -250,7 +250,7 @@ public class GUIMenuDirector extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Franklin Gothic Demi", 0, 26)); // NOI18N
         jLabel2.setText("Lista Anteproyectos No Remitidos");
-        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 10, -1, -1));
+        jPanel2.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 30, -1, -1));
 
         jlbSalirNotificacion.setIcon(new javax.swing.ImageIcon(getClass().getResource("/recursos/CerrarSesion.png"))); // NOI18N
         jlbSalirNotificacion.addMouseListener(new java.awt.event.MouseAdapter() {
