@@ -1,3 +1,4 @@
+//Presentado por: Jefferson Eduardo Campo - Danny Alberto Diaz
 package SGestionAnteproyectos;
 
 import java.time.LocalDate;
@@ -53,7 +54,7 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
     }
 
     /**
-     * Metodo remoto que registra los formatos B con los evaluadores
+     * Metodo remoto que registra los formatos B con los evaluadores, es decir, metodo donde se asignan los evaluadores
      *
      * @param objFormatoB Objeto de tipo formato B que contiene el codigo del
      * anteproyecto con su respectivo evaluador
@@ -65,7 +66,12 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
         System.out.println("==Asignar Evaluador==");
         return formatosB.add(objFormatoB);
     }
-
+    
+    /**
+     * Metodo remoto que registra el anteproyecto en la lista de formatos C
+     * @param objFormatoC Objeto de tipo Formato C que contiene la informacion para el registro
+     * @return Verdadero si se registro exitosamente, falso lo contrario
+     */
     @Override
     public boolean RegistrarFormatoC(clsFormatoCDTO objFormatoC) {
 
@@ -128,6 +134,11 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
 
     }
 
+    /**
+     * Metodo que registra un anteproyecto en la lista de formatos D
+     * @param objFormatoD objeto de tipo formato D que contiene la informacion del anteproyecto a registrar
+     * @return Verdadero si el registro fue exitoso, falso lo contrario
+     */
     @Override
     public boolean RegistrarFormatoD(clsFormatoDDTO objFormatoD) {
 
@@ -198,6 +209,12 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
 
     }
 
+    /**
+     * Metodo que registra la informacion que registra un evaluador de un anteproyecto
+     * @param objFormatoB Objeto de tipo formato B que contiene la la evaluacion de un evaluador
+     * @return 1 si la modificacion fue correcta, 0 o -1 si ocurre algun error
+     * en el proceso de guardado
+     */
     @Override
     public int ModificarFormatoB(clsFormatoBDTO objFormatoB) {
 
@@ -292,6 +309,11 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
 
     }
 
+    /**
+     * Metodo que consulta el concepto del Jefe de Departamento
+     * @param prmCodigo Codigo del anteproyecto a consultar
+     * @return  si el concepto es aprobado o 0 si no es aprobado
+     */
     @Override
     public int ConsultarConceptoC(int prmCodigo) {
 
@@ -309,6 +331,11 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
         
     }
 
+    /**
+     * Metodo para consultar el concepto del Coordinador
+     * @param prmCodigo Codigo del anteproyecto a consultar
+     * @return 1 si el concepto es aprobado o 0 si el concepto es no aprobado
+     */
     @Override
     public int ConsultarConceptoD(int prmCodigo) {
 
@@ -326,6 +353,11 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
 
     }
 
+    /**
+     * Metodo para consultar los conceptos de los evaluadores
+     * @param prmCodigo Codigo del anteproyecto a consultar
+     * @return un objeto de tipo clsConceptosDTO es cual contiene la los dos conceptos de los evaluadores
+     */
     @Override
     public clsConceptosDTO consultarConceptos(int prmCodigo) {
 
@@ -359,6 +391,11 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
         return objConceptos;
     }
 
+    /**
+     * Metodo para verificar en que formato se encuetra el anteproyecto
+     * @param prmCodigo Codigo del anteproyecto a consultar
+     * @return valor o estado en que se encuentra el anteproyecto 
+     */
     @Override
     public int VerificarAnteproyecto(int prmCodigo) {
 
@@ -375,6 +412,10 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
 
     }
 
+    /**
+     * Metodo que genera un codigo con un formato para el registro de un anteproyecto
+     * @return el codigo generado para el anteproyecto
+     */
     @Override
     public int SolicitarCodigo() {
         System.out.println("==Solicitar Codigo==");
@@ -399,6 +440,11 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
         
     }
 
+    /**
+     * Metodo que verifica si un anteproyecto esta disponible 
+     * @param codigo Codigo del anteproyecto a consultar
+     * @return 1 si el anteproyecto consultado esta disponible
+     */
     @Override
     public int ConsultarAnteproyectoB(int codigo) {
 
@@ -439,6 +485,13 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
         return bandera;
     }
 
+    /**
+     * Metodo que verifica si un evaluador fue asignado a un anteproyecto
+     * @param CodAnteproyecto codigo del anteproyecto a consultar
+     * @param idEvaluador identificacion del evaluador para verificar si le fue asignado el anteproyecto
+     * @return Verdadero si el evaluador fue asignado, falso si el evaluador no
+     * tiene relacion con el anteproyecto consultado
+     */
     @Override
     public boolean verificarAsignacion(int CodAnteproyecto, int idEvaluador) {
 
@@ -459,6 +512,11 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
         
     }
 
+    /**
+     * Metodo que retorna la lista de los anteproyectos asignados a un evaludor
+     * @param idEvaluador Identificacion del evaluador con el cual se va a consultar 
+     * @return vector de los anteproyectos asignados a un evaluador
+     */
     @Override
     public clsFormatoBDTO[] listaAteproyectosAsignados(int idEvaluador) {
 
@@ -477,6 +535,10 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
         
     }
 
+    /**
+     * Metodo que obtiene una lista de todos los anteproyectos aprobados por los evaluadores
+     * @return Vector de anteproyectos del formato B
+     */
     @Override
     public clsFormatoBDTO[] listaAteproyectosB() {
 
@@ -518,6 +580,10 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
 
     }
 
+    /**
+     * Metodo que obtiene la lista de los anteproyectsos aprobados por el jefe de departamento
+     * @return Lista de anteproyectos del formato C arobados
+     */
     @Override
     public clsFormatoCDTO[] listaAteproyectosC() {
         System.out.println("==Listar Anteproyectos FormatoC==");
@@ -538,6 +604,10 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
         return arrayFromatosC;
     }
 
+    /**
+     * Metodo que obtiene la lista de los anteproyectos aprobados por los coordinadores
+     * @return un vector de anteproyectos de tipo formato D
+     */
     @Override
     public clsFormatoDDTO[] listaAteproyectosD() {
 
@@ -558,6 +628,10 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
         
     }
 
+    /**
+     * Metodo que obtiene una lista de los anteproyectos que no han sido asignados a un evaluador
+     * @return vector con los anteproyectos que no han sido asignados a los evaluadores
+     */
     @Override
     public clsFormatoADTO[] listaSinAsignar() {
 
@@ -586,6 +660,11 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
 
     }
 
+    /**
+     * Metodo que obtiene una lista de los anteproyectos no remitidos por el director
+     * @param idDirector id del director que registro el anteproyecto
+     * @return vector de los anteproyectos sin remitir
+     */
     @Override
     public int[] listaAntNoRemitidos(int idDirector) {
 
@@ -608,6 +687,11 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
         
     }
 
+    /**
+     * Metodo para remitir un anteproyecto
+     * @param codAnteproyecto codigo del anteproyecto a remitir 
+     * @return Verdadero si el anteproyecto fue remitido o falso lo contrario
+     */
     @Override
     public boolean remitirAnteproyecto(int codAnteproyecto) {
         
@@ -621,6 +705,10 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
 
     }
 
+    /**
+     * Metodo que retorna la lista de los anteproyectos remitidos
+     * @return vector con los anteproyectos remitidos por el director
+     */
     @Override
     public int[] listaAntRemitidos() {
         System.out.println("==Invvocando a listar anteproyectos remitidos==");
