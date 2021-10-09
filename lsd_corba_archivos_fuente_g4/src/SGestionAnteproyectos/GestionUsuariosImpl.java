@@ -6,18 +6,35 @@ import sop_corba.clsUsuariosDTO;
 
 public class GestionUsuariosImpl extends GestionUsuariosIntPOA {
 
+    /*
+    Atributos
+    */
     private ArrayList<clsUsuariosDTO> usuarios;
 
+    /**
+    Constructor vacio
+    **/
     public GestionUsuariosImpl() {
         this.usuarios = new ArrayList();
     }
 
+    /**
+     * Método que registra un nuevo usuario en la lista de usuarios
+     * @param objUsuario usuario a registrar
+     * @return
+     */
     @Override
     public boolean RegistrarUsuario(clsUsuariosDTO objUsuario) {
         System.out.println("==Registrar Usuario==");
         return usuarios.add(objUsuario);
     }
 
+    /**
+     * Método el cual valida los datos del usuario para iniciar sesión
+     * @param prmUsuario nombre del usuario
+     * @param prmClave contraseña
+     * @return usuario encontrado
+     */
     @Override
     public clsUsuariosDTO IniciarSesion(String prmUsuario, String prmClave) {
         System.out.println("==Iniciar Sesion==");
@@ -31,6 +48,11 @@ public class GestionUsuariosImpl extends GestionUsuariosIntPOA {
         return objUsuario;
     }
 
+    /**
+     * Método que consulta un usuario según la identificación 
+     * @param prmIdentificacion numero de identificación
+     * @return usuario encontrado
+     */
     @Override
     public clsUsuariosDTO ConsultarUsuario(int prmIdentificacion) {
 
@@ -49,12 +71,15 @@ public class GestionUsuariosImpl extends GestionUsuariosIntPOA {
 
     }
 
+    /**
+     * Método que modifica un usuario de la lista
+     * @param objUsuario usuario a modificar
+     * @return usuario encontrado
+     */
     @Override
     public boolean ModificarUsuario(clsUsuariosDTO objUsuario) {
-
         System.out.println("==Modificar Usuario==");
         boolean ban = false;
-
         for (int i = 0; i < this.usuarios.size(); i++) {
             if (this.usuarios.get(i).identificacion == objUsuario.identificacion) {
                 this.usuarios.get(i).nomCompleto = objUsuario.nomCompleto;
@@ -66,14 +91,16 @@ public class GestionUsuariosImpl extends GestionUsuariosIntPOA {
                 break;
             }
         }
-
         return ban;
-
     }
 
+    /**
+     * Método que consulta el evaluador por su identificación
+     * @param ID numero de identificación
+     * @return evaluador encontrado
+     */
     @Override
     public int consultarEvaluador(int ID) {
-
         System.out.println("==Consultar Evaluador==");
         int bandera = -1;
         int ban = 0;
@@ -93,34 +120,35 @@ public class GestionUsuariosImpl extends GestionUsuariosIntPOA {
             System.out.println("Usuario no existe en el sistema");
             bandera = -2;
         }
-
         return bandera;
-
     }
 
+    /**
+     * Método que lista los evaluadores 
+     * @return
+     */
     @Override
     public clsUsuariosDTO[] listarEvaluadores() {
-
         System.out.println("==Listar Evaluadores==");
         ArrayList<clsUsuariosDTO> evaluadores = new ArrayList();
-
         for (int i = 0; i < this.usuarios.size(); i++) {
             if (this.usuarios.get(i).role.equals("Evaluador")) {
                 evaluadores.add(this.usuarios.get(i));
             }
         }
-
         clsUsuariosDTO[] arrayEvaluadores = evaluadores.toArray(new clsUsuariosDTO[0]);
-
         return arrayEvaluadores;
-
     }
 
+    /**
+     * Método que valida los registros de usuarios 
+     * @param idUsuario
+     * @param usuario
+     * @return
+     */
     @Override
     public int ValidarRegistro(int idUsuario, String usuario) {
-
         System.out.println("==Validar Usuario==");
-
         for (int i = 0; i < this.usuarios.size(); i++) {
             if (this.usuarios.get(i).identificacion == idUsuario) {
                 return -1;
@@ -130,9 +158,12 @@ public class GestionUsuariosImpl extends GestionUsuariosIntPOA {
             }
         }
         return 0;
-
     }
 
+    /**
+     * Método que verifica si el usuario tiene una sesión activa
+     * @param idUsuario identificacion del usuario
+     */
     @Override
     public void IniSesion(int idUsuario) {
 
@@ -146,6 +177,10 @@ public class GestionUsuariosImpl extends GestionUsuariosIntPOA {
 
     }
 
+    /**
+     * Método para cerrar la sesión de un usuario
+     * @param idUsuario identificacion del usuario
+     */
     @Override
     public void CerrarSesion(int idUsuario) {
 
@@ -159,6 +194,10 @@ public class GestionUsuariosImpl extends GestionUsuariosIntPOA {
         
     }
 
+    /**
+     * Método que valida que el rol del usuario sea decano
+     * @return 
+     */
     @Override
     public int validarDecano() {
 
@@ -174,5 +213,4 @@ public class GestionUsuariosImpl extends GestionUsuariosIntPOA {
         return contador;
 
     }
-
 }
