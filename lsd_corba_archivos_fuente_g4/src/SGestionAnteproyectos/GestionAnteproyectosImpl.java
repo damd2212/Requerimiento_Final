@@ -39,7 +39,7 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
     }
 
     /**
-     * Metodo remoto que registra el anteproyecto en la lista de Formatos A
+     * Metodo que registra el anteproyecto en la lista de Formatos A
      *
      * @param objFormatoA Objeto de tipo Formato A que recibe para el respectivo
      * registro
@@ -54,7 +54,7 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
     }
 
     /**
-     * Metodo remoto que registra los formatos B con los evaluadores, es decir, metodo donde se asignan los evaluadores
+     * Metodo que registra los formatos B con los evaluadores, es decir, metodo donde se asignan los evaluadores
      *
      * @param objFormatoB Objeto de tipo formato B que contiene el codigo del
      * anteproyecto con su respectivo evaluador
@@ -68,7 +68,7 @@ public class GestionAnteproyectosImpl extends GestionAnteproyectosIntPOA {
     }
     
     /**
-     * Metodo remoto que registra el anteproyecto en la lista de formatos C
+     * Metodo que registra el anteproyecto en la lista de formatos C
      * @param objFormatoC Objeto de tipo Formato C que contiene la informacion para el registro
      * @return Verdadero si se registro exitosamente, falso lo contrario
      */
