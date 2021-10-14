@@ -59,7 +59,7 @@ public class GestionUsuariosImpl extends GestionUsuariosIntPOA {
         System.out.println("==Consultar Usuario==");
         clsUsuariosDTO objUsuario = new clsUsuariosDTO(-1, "", "", "", "", "", false);
         if (this.usuarios.isEmpty()) {
-            return null;
+            return objUsuario;
         }
         for (int i = 0; i < this.usuarios.size(); i++) {
             if (this.usuarios.get(i).identificacion == prmIdentificacion) {
