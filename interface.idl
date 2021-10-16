@@ -1,0 +1,122 @@
+module sop_corba {
+
+	struct clsConceptosDTO{
+		string Concepto1;
+		string Concepto2;					
+	};
+
+	struct clsFormatoADTO{
+		long codAnteproyecto;
+		string nomPrograma;
+		string tituloAnteproyecto;
+		string nomEstudiante1;
+		long codEstudiante1;
+		string nomEstudiante2;
+		long codEstudiante2;
+		string nomDirector;
+		string nomCoDirector;
+		string objetivosAnteproyecto;
+		long codDirector;
+		long flujo;
+	};
+
+	struct clsFormatoBDTO{
+		long codAnteproyecto;
+		string concepto;
+		string observaciones;
+		string fechaEvaluacion;
+		long idEvaluador;
+	};
+
+	struct clsFormatoCDTO{
+		long codAnteproyecto;
+		string estructura;
+		string conceptoDepto;
+		string observaciones;
+	};
+
+	struct clsFormatoDDTO{
+		long codAnteproyecto;
+		string estructura;
+		string conceptoCoodinador;
+		string observaciones;
+	};
+
+	struct clsUsuariosDTO{
+		long identificacion;
+		string nomCompleto;
+		string role;
+		string departamento;
+		string usuario;
+		string clave;
+		boolean sesion;
+	};
+
+	struct clsFormatosDTO{
+		clsFormatoADTO formatoA;
+		clsFormatoBDTO formatoB1;
+		clsFormatoBDTO formateB2;
+		clsFormatoCDTO formatoC;
+		clsFormatoDDTO formatoD;
+		long codAnteproyecto;
+	};
+
+	struct clsResolucionDTO{
+		string numResolucion;
+		string fecha;
+		string codAnteproyecto;
+	};
+		
+    interface GestionUsuariosInt{	
+    	typedef sequence< clsUsuariosDTO > ListaUsuarios;	
+		boolean RegistrarUsuario(in clsUsuariosDTO objUsuario);
+		clsUsuariosDTO IniciarSesion(in string prmUsuario ,in string prmClave);
+		clsUsuariosDTO ConsultarUsuario(in long prmIdentificacion);
+		boolean ModificarUsuario(in clsUsuariosDTO objUsuario);
+		long consultarEvaluador(in long ID);
+		ListaUsuarios listarEvaluadores();
+		long ValidarRegistro (in long idUsuario,in string usuario);
+		void IniSesion(in long idUsuario);
+		void CerrarSesion(in long idUsuario);
+		long validarDecano();
+	};
+
+	interface GestionSeguimientoInt{
+		typedef sequence< clsFormatosDTO > ListaAnteproyectos;
+		typedef sequence< clsResolucionDTO > ListaResoluciones;
+		boolean RegistrarHistorial(in clsFormatosDTO objFormatos);
+		boolean RegistrarResolucion(in long Codigo);
+		ListaResoluciones consultarResoluciones();
+		ListaAnteproyectos consultarHistorial();
+	};
+
+	interface GestionAnteproyectosInt{		
+		typedef sequence< clsFormatoADTO > formatosA;
+		typedef sequence< clsFormatoBDTO > formatosB;
+		typedef sequence< clsFormatoCDTO > formatosC;
+		typedef sequence< clsFormatoDDTO > formatosD;
+		typedef sequence< long > listaAnteproyectosNoRemitidos;
+		typedef sequence< long > listaAnteproyectosRemitidos;
+		boolean registrarFormatoA(in clsFormatoADTO objFormatoA);
+		boolean AsignarFormatoB(in clsFormatoBDTO objFormatoB);
+		boolean RegistrarFormatoC(in clsFormatoCDTO objFormatoC);
+		boolean RegistrarFormatoD(in clsFormatoDDTO objFormatoD);
+		long ModificarFormatoB(in clsFormatoBDTO objFormatoB);
+		long ConsultarConceptoC(in long prmCodigo);
+		long ConsultarConceptoD(in long prmCodigo);
+		clsConceptosDTO consultarConceptos(in long prmCodigo);
+		long VerificarAnteproyecto(in long prmCodigo);
+		long SolicitarCodigo();
+		long ConsultarAnteproyectoB(in long codigo);
+		boolean verificarAsignacion(in long CodAnteproyecto,in long idEvaluador);
+		formatosB listaAteproyectosAsignados(in long idEvaluador);
+		formatosB listaAteproyectosB();
+		formatosC listaAteproyectosC();
+		formatosD listaAteproyectosD();
+		formatosA listaSinAsignar();
+		listaAnteproyectosNoRemitidos listaAntNoRemitidos(in long idDirector);
+		boolean remitirAnteproyecto(in long codAnteproyecto);
+		listaAnteproyectosRemitidos listaAntRemitidos();
+	};
+
+}; 
